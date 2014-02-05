@@ -29,6 +29,18 @@
 %              .WhichWeights --  Default = 'resampled';
 %                                Possible values = {'resampled', 'fbden'};
 %
+%            'EPFL'        :
+%              .Parcellation -- Default = 'high';
+%                               Possible values = {'high', 'low'};
+%              .WhichWeights -- Default = 'fbden';
+%                               Possible values = {'fbden', 'fbcount'}
+%              .hemisphere -- Which brain hemisphere/s to include. 
+%                             Default = 'right'; 
+%                             Possible values = {'right', 'left', 'both'}; 
+%              .RemoveThalamus -- Default = false;
+%              .RemoveBrainStem -- Default = true;
+%              .subject -- Default = 1; Possible values = 1:40; 
+%
 % OUTPUT: 
 %          Connectivity -- the data is returned in the same structure that is
 %                          passed in. Added fields include:
@@ -749,10 +761,109 @@ function [Connectivity] = GetConnectivity(Connectivity)
         Connectivity.NodeStr(Connectivity.ThalamicNodes)           = []; %Throw out corresponding NodeStr
         Connectivity.NodeStrIntuitive(Connectivity.ThalamicNodes)  = []; %Throw out corresponding NodeStrIntuitive
         Connectivity.ThalamicNodes(Connectivity.ThalamicNodes)     = [];
-        Connectivity.NumberOfNodes = length(Connectivity.NodeStr);      %Reset N for cortex only matrix...
+        Connectivity.NumberOfNodes = length(Connectivity.NodeStr);       %Reset N for cortex only matrix...
       end
      
-   %---------------------------------------------------------------%  
+   %---------------------------------------------------------------% 
+   
+    case 'EPFL'
+      if ~isfield(Connectivity,'invel'),
+       Connectivity.invel = 1.0; %%must be either a single number or vec(1,N)
+      end
+     
+     if ~isfield(Connectivity,'Parcellation'),
+       Connectivity.Parcellation = 'high';  %Load high resolution matrix
+     end
+     if ~isfield(Connectivity,'WhichWeights'),
+       Connectivity.WhichWeights = 'fbden'; %Use fiber density weights
+     end
+     
+     if ~isfield(Connectivity,'RemoveThalamus'),
+       Connectivity.RemoveThalamus = false;
+     end
+     if ~isfield(Connectivity,'RemoveBrainStem'),
+       Connectivity.RemoveThalamus = true;
+     end
+     
+     if ~isfield(Connectivity,'subject'),
+       Connectivity.subject = 1;
+     end
+     
+     if strcmp(Connectivity.Parcellation, 'full')
+       Connectivity.weights_idx  = 2;
+       Connectivity.position_idx = 5;
+     else 
+       Connectivity.weights_idx  = 1;
+       Connectivity.position_idx = 1;
+     end
+         
+                            
+     %Load the connectivity matrix data
+     load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_04022014.mat']); %Contains: 83 and 1015 ROIs connectomes
+
+     %Load centroids - region centres
+     load(['ConnectivityData' Sep 'EPFL_centroids_04022014.mat']);
+     
+     %Load node strings, anatomical labels, cortical regions
+     %...EPFL_ROIs_mapping_ParcellationLausanne2008
+     
+     switch Connectivity.WhichWeights, 
+       case 'fbden' 
+         Connectivity.weights  = SC_density{Connectivity.weights_idx}(:, :, Connectivity.subject);
+       case 'fbcount'
+         % rescale 
+         Connectivity.weights  = log(SC_number{Connectivity.weights_idx}(:, :, Connectivity.subject));
+       otherwise
+         error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['WhichWeights for EPFL must be either ''fbcount'' or ''fbden''. You requested ''' Connectivity.WhichWeights '''.']);
+     end
+     
+     % Region centres
+     Connectivity.Positions = centroids{Connectivity.position_idx}(:, :, Connectivity.subject);
+     Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
+     Connectivity.ThalamicNodes = [];
+     Connectivity.BrainStemNodes = [];
+     
+     % Connection-wise average streamline lengths
+     Connectivity.tract_lengths = L{Connectivity.weights_idx}(:, :, Connectivity.subject);
+     
+     % Compute delay matrix
+     Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
+     Connectivity.delay = Connectivity.invel.*Connectivity.tract_lengths;
+     Connectivity.delay(Connectivity.weights==0) = 0;
+     
+     switch Connectivity.Parcellation
+         case 'high'
+             
+         case 'low'
+         Connectivity.NodeStr = {'LOF', 'PORB', 'FP', 'MOF', 'PTRI', 'POPE', ...
+                             'RMF', 'SF', 'CMF', 'PREC', 'PARC', 'RAC', ...
+                             'CAC', 'PC', 'ISTC', 'PSTS', 'SMAR', 'SP', ...
+                             'IP', 'PCUN', 'CUN', 'PCAL', 'LOCC', 'LING', ...
+                             'FUS', 'PARH', 'ENT', 'TP', 'IT', 'MT', ...
+                             'BSTS', 'ST', 'TT', 'INS', 'THAL', 'CAU', ...
+                             'PUT', 'PALL', 'NACC', 'HC', 'AMYG', 'BS'};
+                         
+         otherwise
+             error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['Parcellation for EPFL must be either ''high'' or ''low''. You requested ''' Connectivity.WhichWeights '''.']);
+     end
+     
+     
+     if Connectivity.RemoveThalamus
+         Connectivity.weights(Connectivity.ThalamicNodes, :) = [];
+         Connectivity.weights(:, Connectivity.ThalamicNodes) = [];
+         Connectivity.delays(Connectivity.ThalamicNodes, :) = [];
+         Connectivity.delays(:, Connectivity.ThalamicNodes) = [];
+             
+     end
+     
+     if Connectivity.RemoveBrainStem
+         Connectivity.weights(end, :) = [];
+         Connectivity.weights(:, end) = [];
+         Connectivity.delays(end, :) = [];
+         Connectivity.delays(:, end) = [];
+     end
+
+     
    otherwise
      error(strcat('BrainNetworkModels:', mfilename,':UnknownConnectionMatrix'), ['Don''t know how to load this matrix...' ThisMatrix]);
  end %switch ThisMatrix
