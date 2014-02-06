@@ -60,9 +60,16 @@
 
 
 %% Write supplementry information as a text file
+
 fid = fopen([DirectoryName filesep 'info.txt'], 'wt');
 
-  fprintf(fid, '%s %s \n', 'Matrix label: ', options.Connectivity.WhichMatrix)
+  if ~isfield(options.Connectivity, 'WhichSubject'),
+     fprintf(fid, '%s %s \n', 'Matrix label: ', options.Connectivity.WhichMatrix)
+  else
+     fprintf(fid, '%s %s \n', 'Matrix label: ', [options.Connectivity.WhichMatrix '_' options.Connectivity.WhichSubject])
+  end
+
+
   fprintf(fid, '%s %s \n', 'Centres space: ', options.Connectivity.centres)
   fprintf(fid, '%s %d \n', 'Number of regions: ', options.Connectivity.NumberOfNodes)
   
