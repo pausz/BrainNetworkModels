@@ -509,14 +509,14 @@ function [Connectivity] = GetConnectivity(Connectivity)
          LabelMapping        = cell(1,36);
          DSIlabel            = cell(1,36);
          for j = 2:37,
-           InterHemisphericStr{1,j-1} = CallosalConnections.textdata{j,4};
-           LabelMapping{1,j-1}  = CallosalConnections.textdata{j,2};
-           DSIlabel{1,j-1}      = CallosalConnections.textdata{j,1};
+           InterHemisphericStr{1,j-1} = CallosalConnections.textdata.Sheet1{j,4};
+           LabelMapping{1,j-1}  = CallosalConnections.textdata.Sheet1{j,2};
+           DSIlabel{1,j-1}      = CallosalConnections.textdata.Sheet1{j,1};
          end
          if isoctave(),
            InterHemispheric = CallosalConnections.data(2:37,5);
          else %Presumably Matlab
-            InterHemispheric = CallosalConnections.data(:,5);
+            InterHemispheric = CallosalConnections.data.Sheet1(:,5);
          end
          %keyboard
          
@@ -687,8 +687,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
        otherwise
          error(strcat('BrainNetworkModels:', mfilename,':UnknownParcellation'), ['Parcellation for DSI_enhanced must be either ''full'' or ''roi''. You requested ''' Connectivity.Parcellation '''.']);
      end
-   
-     
+  
      
    case 'G_20110513' 
      if ~isfield(Connectivity,'invel'),
@@ -782,14 +781,14 @@ function [Connectivity] = GetConnectivity(Connectivity)
        Connectivity.RemoveThalamus = false;
      end
      if ~isfield(Connectivity,'RemoveBrainStem'),
-       Connectivity.RemoveThalamus = true;
+       Connectivity.RemoveBrainStem = true;
      end
      
      if ~isfield(Connectivity,'subject'),
        Connectivity.subject = 1;
      end
      
-     if strcmp(Connectivity.Parcellation, 'full')
+     if strcmp(Connectivity.Parcellation, 'high')
        Connectivity.weights_idx  = 2;
        Connectivity.position_idx = 5;
      else 
@@ -803,9 +802,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
 
      %Load centroids - region centres
      load(['ConnectivityData' Sep 'EPFL_centroids_04022014.mat']);
-     
-     %Load node strings, anatomical labels, cortical regions
-     %...EPFL_ROIs_mapping_ParcellationLausanne2008
+
      
      switch Connectivity.WhichWeights, 
        case 'fbden' 
@@ -818,7 +815,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
      end
      
      % Region centres
-     Connectivity.Positions = centroids{Connectivity.position_idx}(:, :, Connectivity.subject);
+     Connectivity.Position = centroids{Connectivity.position_idx}(:, :, Connectivity.subject);
      Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
      Connectivity.ThalamicNodes = [];
      Connectivity.BrainStemNodes = [];
@@ -831,10 +828,29 @@ function [Connectivity] = GetConnectivity(Connectivity)
      Connectivity.delay = Connectivity.invel.*Connectivity.tract_lengths;
      Connectivity.delay(Connectivity.weights==0) = 0;
      
+     
      switch Connectivity.Parcellation
          case 'high'
+         
+         temp = importdata(['ConnectivityData' Sep 'EPFL_1015ROIs.txt']);
+         Connectivity.NodeStr = temp.textdata(2:end,2);
+         Connectivity.ThalamicNodes = not(cell2mat(temp.textdata(2:end, 3)));
+         
+         for j = 1:ceil(Connectivity.NumberOfNodes/2),
+           Connectivity.NodeStr{j} = ['r' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
+         end
+         for j = (ceil(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
+           Connectivity.NodeStr{j} = ['l' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
+         end
+         
+         Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
+             
              
          case 'low'
+             
+         temp = importdata(['ConnectivityData' Sep 'EPFL_83ROIs.txt']);
+         Connectivity.ThalamicNodes = not(temp.data);
+         
          Connectivity.NodeStr = {'LOF', 'PORB', 'FP', 'MOF', 'PTRI', 'POPE', ...
                              'RMF', 'SF', 'CMF', 'PREC', 'PARC', 'RAC', ...
                              'CAC', 'PC', 'ISTC', 'PSTS', 'SMAR', 'SP', ...
@@ -843,25 +859,64 @@ function [Connectivity] = GetConnectivity(Connectivity)
                              'BSTS', 'ST', 'TT', 'INS', 'THAL', 'CAU', ...
                              'PUT', 'PALL', 'NACC', 'HC', 'AMYG', 'BS'};
                          
+         Connectivity.NodeStr = [Connectivity.NodeStr ; Connectivity.NodeStr];
+         % Human readable labels
+         Connectivity.NodeStrIntuitive = importdata(['ConnectivityData' Sep 'EPFL_NodeStrIntuitive_04022014.txt']);
+         Connectivity.NodeStrIntuitive = [Connectivity.NodeStrIntuitive ; Connectivity.NodeStrIntuitive];
+         
+         %Delete duplicate BrainStem
+         Connectivity.NodeStr(42) = [];
+         Connectivity.NodeStrIntuitive(42) = [];
+         
+         for j = 1:ceil(Connectivity.NumberOfNodes/2),
+           Connectivity.NodeStr{j} = ['r' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
+           Connectivity.NodeStrIntuitive{j} = [Connectivity.NodeStr{j} ': ' Connectivity.NodeStrIntuitive{j}]; %Prepend with r for right hemisphere
+         end
+         for j = (ceil(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
+           Connectivity.NodeStr{j} = ['l' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
+           Connectivity.NodeStrIntuitive{j} = [Connectivity.NodeStr{j} ': ' Connectivity.NodeStrIntuitive{j}];  
+         end
+                         
          otherwise
              error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['Parcellation for EPFL must be either ''high'' or ''low''. You requested ''' Connectivity.WhichWeights '''.']);
      end
      
      
      if Connectivity.RemoveThalamus
-         Connectivity.weights(Connectivity.ThalamicNodes, :) = [];
-         Connectivity.weights(:, Connectivity.ThalamicNodes) = [];
-         Connectivity.delays(Connectivity.ThalamicNodes, :) = [];
-         Connectivity.delays(:, Connectivity.ThalamicNodes) = [];
+         NodesToRemove = find(Connectivity.ThalamicNodes);
+         Connectivity.weights(NodesToRemove, :) = [];
+         Connectivity.weights(:, NodesToRemove) = [];
+         Connectivity.delay(NodesToRemove, :) = [];
+         Connectivity.delay(:, NodesToRemove) = [];
+         Connectivity.Position(NodesToRemove, :) = [];
+         Connectivity.NodeStr(NodesToRemove) = [];
+         Connectivity.NodeStrIntuitive(NodesToRemove) = [];
+         Connectivity.NumberOfNodes = Connectivity.NumberOfNodes - length(NodesToRemove);
              
      end
      
      if Connectivity.RemoveBrainStem
          Connectivity.weights(end, :) = [];
          Connectivity.weights(:, end) = [];
-         Connectivity.delays(end, :) = [];
-         Connectivity.delays(:, end) = [];
+         Connectivity.delay(end, :) = [];
+         Connectivity.delay(:, end) = [];
+         Connectivity.Position(end, :) = [];
+         Connectivity.NodeStr(end) = [];
+         Connectivity.NodeStrIntuitive(end) = [];
+         Connectivity.NumberOfNodes = Connectivity.NumberOfNodes - 1;
      end
+     
+     Connectivity.LeftNodes = ones(Connectivity.NumberOfNodes, 1);
+     
+     % if the brainstem is there, consider it as part of the left
+     % hemisphere
+     Connectivity.LeftNodes(1:floor(Connectivity.NumberOfNodes/2)) = 0;
+     
+     
+     %Get subject ID to use it in the name of the directory
+     Connectivity.subject = code(Connectivity.subject);
+     Connectivity.tract_lengths = [];
+     
 
      
    otherwise
