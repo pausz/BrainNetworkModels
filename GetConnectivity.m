@@ -834,7 +834,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          
          temp = importdata(['ConnectivityData' Sep 'EPFL_1015ROIs.txt']);
          Connectivity.NodeStr = temp.textdata(2:end,2);
-         Connectivity.ThalamicNodes = not(cell2mat(temp.textdata(2:end, 3)));
+         Connectivity.ThalamicNodes = not(str2num(cell2mat(temp.textdata(2:end, 3))));
          
          for j = 1:ceil(Connectivity.NumberOfNodes/2),
            Connectivity.NodeStr{j} = ['r' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
@@ -892,6 +892,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          Connectivity.NodeStr(NodesToRemove) = [];
          Connectivity.NodeStrIntuitive(NodesToRemove) = [];
          Connectivity.NumberOfNodes = Connectivity.NumberOfNodes - length(NodesToRemove);
+         Connectivity.ThalamicNodes(NodesToRemove) = [];
              
      end
      
@@ -904,6 +905,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          Connectivity.NodeStr(end) = [];
          Connectivity.NodeStrIntuitive(end) = [];
          Connectivity.NumberOfNodes = Connectivity.NumberOfNodes - 1;
+         Connectivity.ThalamicNodes(end) = [];
      end
      
      Connectivity.LeftNodes = ones(Connectivity.NumberOfNodes, 1);
