@@ -35,7 +35,7 @@
 %              .WhichWeights -- Default = 'fbden';
 %                               Possible values = {'fbden', 'fbcount'}
 %              .hemisphere   -- Which brain hemisphere/s to include. 
-%                               Default = 'right'; 
+%                               Default = 'both'; 
 %                               Possible values = {'right', 'left', 'both'}; 
 %              .RemoveThalamus  -- Default = false;
 %              .RemoveBrainStem -- Default = true;
@@ -947,6 +947,9 @@ function [Connectivity] = GetConnectivity(Connectivity)
      % if the brainstem is there, consider it as part of the left
      % hemisphere
      Connectivity.LeftNodes(1:floor(Connectivity.NumberOfNodes/2)) = 0;
+     
+     % extra info
+     Connectivity.centres = 'T1_subjects_space'
 
      
    otherwise
