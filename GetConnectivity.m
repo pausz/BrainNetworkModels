@@ -34,11 +34,13 @@
 %                               Possible values = {'high', 'low'};
 %              .WhichWeights -- Default = 'fbden';
 %                               Possible values = {'fbden', 'fbcount'}
-%              .hemisphere -- Which brain hemisphere/s to include. 
-%                             Default = 'right'; 
-%                             Possible values = {'right', 'left', 'both'}; 
-%              .RemoveThalamus -- Default = false;
+%              .hemisphere   -- Which brain hemisphere/s to include. 
+%                               Default = 'right'; 
+%                               Possible values = {'right', 'left', 'both'}; 
+%              .RemoveThalamus  -- Default = false;
 %              .RemoveBrainStem -- Default = true;
+%              .WhichSubject    -- Default = 'individual';
+%                                  Possible values = {'individual', 'average'}
 %              .subject -- Default = 1; Possible values = 1:40; 
 %
 % OUTPUT: 
@@ -784,8 +786,21 @@ function [Connectivity] = GetConnectivity(Connectivity)
        Connectivity.RemoveBrainStem = true;
      end
      
+     
+     if ~isfield(Connectivity,'WhichSubject'),
+       Connectivity.WhichSubject = 'individual';
+     end
+     
      if ~isfield(Connectivity,'subject'),
        Connectivity.subject = 1;
+     end
+     
+     if ~isfield(Connectivity,'hemisphere'),
+       Connectivity.hemisphere = 'both';
+     end
+     
+     if ~strcmp(Connectivity.hemisphere, 'both'),
+       error(strcat('BrainNetworkModels:', mfilename,':NotImplemented'), ['Haven''t implemented split into hemispheres yet ...']);
      end
      
      if strcmp(Connectivity.Parcellation, 'high')
@@ -814,19 +829,38 @@ function [Connectivity] = GetConnectivity(Connectivity)
          error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['WhichWeights for EPFL must be either ''fbcount'' or ''fbden''. You requested ''' Connectivity.WhichWeights '''.']);
      end
      
-     % Region centres
-     Connectivity.Position = centroids{Connectivity.position_idx}(:, :, Connectivity.subject);
-     Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
-     Connectivity.ThalamicNodes = [];
-     Connectivity.BrainStemNodes = [];
      
-     % Connection-wise average streamline lengths
-     Connectivity.tract_lengths = L{Connectivity.weights_idx}(:, :, Connectivity.subject);
+         Connectivity.ThalamicNodes = [];
+         Connectivity.BrainStemNodes = [];
      
-     % Compute delay matrix
-     Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
-     Connectivity.delay = Connectivity.invel.*Connectivity.tract_lengths;
-     Connectivity.delay(Connectivity.weights==0) = 0;
+     switch Connectivity.WhichSubject,
+         case 'average'
+         % compute an average subject
+         
+         % Region centres
+         Connectivity.Position = mean(centroids{Connectivity.position_idx}(:, :, :), 3);
+         Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
+
+         % Compute delay matrix
+         Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
+         Connectivity.delay = Connectivity.invel.*mean(L{Connectivity.weights_idx}(:, :, :), 3);
+         Connectivity.delay(Connectivity.weights==0) = 0;
+         
+         case 'individual'
+             
+         % Region centres
+         Connectivity.Position = centroids{Connectivity.position_idx}(:, :, Connectivity.subject);
+         Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
+
+
+         % Compute delay matrix
+         Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
+         Connectivity.delay = Connectivity.invel.*L{Connectivity.weights_idx}(:, :, Connectivity.subject);
+         Connectivity.delay(Connectivity.weights==0) = 0;
+         %Get subject ID to use it in the name of the directory
+         Connectivity.WhichSubject = code(Connectivity.subject);
+         
+     end
      
      
      switch Connectivity.Parcellation
@@ -913,12 +947,6 @@ function [Connectivity] = GetConnectivity(Connectivity)
      % if the brainstem is there, consider it as part of the left
      % hemisphere
      Connectivity.LeftNodes(1:floor(Connectivity.NumberOfNodes/2)) = 0;
-     
-     
-     %Get subject ID to use it in the name of the directory
-     Connectivity.subject = code(Connectivity.subject);
-     Connectivity.tract_lengths = [];
-     
 
      
    otherwise
