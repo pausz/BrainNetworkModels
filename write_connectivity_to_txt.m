@@ -16,7 +16,11 @@
 
 %% Create a directory name
  DirectoryName = lower(options.Connectivity.WhichMatrix);
- DirectoryName = [DirectoryName '_hemisphere_' lower(options.Connectivity.hemisphere)];
+ if ~isfield(options.Connectivity.WhichSubject),
+        DirectoryName = [DirectoryName '_hemisphere_' lower(options.Connectivity.hemisphere)];
+ else
+     DirectoryName = [DirectoryName '_' lower(options.Connectivity.WhichSubject) '_hemisphere_' lower(options.Connectivity.hemisphere)];
+ end
  if options.Connectivity.RemoveThalamus,
    DirectoryName = [DirectoryName '_subcortical_false'];
  else
