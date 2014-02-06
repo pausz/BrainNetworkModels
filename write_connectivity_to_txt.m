@@ -16,7 +16,7 @@
 
 %% Create a directory name
  DirectoryName = lower(options.Connectivity.WhichMatrix);
- if ~isfield(options.Connectivity.WhichSubject),
+ if ~isfield(options.Connectivity, 'WhichSubject'),
         DirectoryName = [DirectoryName '_hemisphere_' lower(options.Connectivity.hemisphere)];
  else
      DirectoryName = [DirectoryName '_' lower(options.Connectivity.WhichSubject) '_hemisphere_' lower(options.Connectivity.hemisphere)];
