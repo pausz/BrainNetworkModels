@@ -1,17 +1,43 @@
+function write_connectivity_to_txt(Connectivity, saveoptions)
 %% Write connectivity data to bzip2'd text files for use as test data in  
 % tvb.simulator, also write suplimentary info, but don't bzip2 it. 
 % NOTE: This doesn't currently include the additional region area and
 %       average orientation information...
-
-%% Specify connectivity data 
+%
+% ARGUMENTS: 
+%          Connectivity -- a structure containing the options, specific to
+%                          each matrix.
+%          saveoptions  -- a strucutre containing the output format
+%          
+%
+% OUTPUT: 
+%           []
+%
+% USAGE:
+%{
  options.Connectivity.WhichMatrix = 'O52R00_IRP2008';
  options.Connectivity.hemisphere = 'both';
  options.Connectivity.RemoveThalamus = true;
  options.Connectivity.invel = 1;
- 
-
-%% Get it
  options.Connectivity = GetConnectivity(options.Connectivity);
+
+%}
+%
+% MODIFICATION HISTORY:
+%     SAK(DD-MM-YYYY) -- Original.
+
+
+
+
+options.Connectivity = Connectivity;
+
+% Set some default saveoptions
+if nargin < 2,
+   %bzip2 txt files
+   saveoptions.bzipit = true;
+   %create additional TVB-friendly zip file 
+   saveoptions.zipit   = true;
+end
 
 
 %% Create a directory name
@@ -36,14 +62,17 @@
  weights = options.Connectivity.weights;
  save([DirectoryName filesep 'weights.txt'], 'weights', '-ASCII');
  
- system(['bzip2 ' DirectoryName filesep 'weights.txt'])
-
+ if saveoptions.bzipit,
+     system(['bzip2 ' DirectoryName filesep 'weights.txt'])
+ end
 
 %% Write tract_lengths as bzip2'd text files 
  tract_lengths = options.Connectivity.delay;
  save([DirectoryName filesep 'tract_lengths.txt'], 'tract_lengths', '-ASCII');
  
- system(['bzip2 ' DirectoryName filesep 'tract_lengths.txt'])
+     if saveoptions.bzipit,
+         system(['bzip2 ' DirectoryName filesep 'tract_lengths.txt'])
+     end
  
 
 %% Write centres as bzip2'd text files
@@ -55,8 +84,10 @@
    fprintf(fid, '%s %10.6f %10.6f %10.6f \n', NodeStr{k}, centres(k,:))
  end
  fclose(fid);
-
- system(['bzip2 ' DirectoryName filesep 'centres.txt'])
+ if saveoptions.bzipit,
+     
+    system(['bzip2 ' DirectoryName filesep 'centres.txt'])
+ end
 
 
 %% Write supplementry information as a text file
@@ -78,5 +109,29 @@ fid = fopen([DirectoryName filesep 'info.txt'], 'wt');
   
  fclose(fid);
  
+ %% Write average region orientations as bzip2'd text files 
+if ~isfield(options.Connectivity, 'AverageOrientation'),
+    average_orientations = options.Connectivity.delay;
+    save([DirectoryName filesep 'average_orientations.txt'], 'average_orientations', '-ASCII');
+    if saveoptions.bzipit,
+        system(['bzip2 ' DirectoryName filesep 'average_orientations.txt'])
+    end
+end
+     
+%% Write average region orientations as bzip2'd text files 
+ if ~isfield(options.Connectivity, 'Area'),
+    areas = options.Connectivity.delay;
+    save([DirectoryName filesep 'area.txt'], 'areas', '-ASCII');
+    if saveoptions.bzipit,
+        system(['bzip2 ' DirectoryName filesep 'areas.txt'])
+    end
+ end 
  
+ %% Write a zip file
+ if saveoptions.bzipit,
+     filelist = {[DirectoryName filesep 'tract_lengths.txt.bz2'], [DirectoryName filesep 'weights.txt.bz2'], [DirectoryName filesep 'centres.txt.bz2']}; 
+     zip(DirectoryName, filelist)
+ end
+ clear options
+end
  %%% EoF %%% 
