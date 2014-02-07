@@ -110,7 +110,7 @@ fid = fopen([DirectoryName filesep 'info.txt'], 'wt');
  fclose(fid);
  
  %% Write average region orientations as bzip2'd text files 
-if ~isfield(options.Connectivity, 'AverageOrientation'),
+if isfield(options.Connectivity, 'AverageOrientation'),
     average_orientations = options.Connectivity.delay;
     save([DirectoryName filesep 'average_orientations.txt'], 'average_orientations', '-ASCII');
     if saveoptions.bzipit,
@@ -119,7 +119,7 @@ if ~isfield(options.Connectivity, 'AverageOrientation'),
 end
      
 %% Write average region orientations as bzip2'd text files 
- if ~isfield(options.Connectivity, 'Area'),
+ if isfield(options.Connectivity, 'Area'),
     areas = options.Connectivity.delay;
     save([DirectoryName filesep 'area.txt'], 'areas', '-ASCII');
     if saveoptions.bzipit,
@@ -128,7 +128,7 @@ end
  end 
  
  %% Write a zip file
- if saveoptions.bzipit,
+ if saveoptions.zipit,
      filelist = {[DirectoryName filesep 'tract_lengths.txt.bz2'], [DirectoryName filesep 'weights.txt.bz2'], [DirectoryName filesep 'centres.txt.bz2']}; 
      zip(DirectoryName, filelist)
  end
