@@ -18,7 +18,7 @@
 % USAGE:
 %{
       tr = TriRep(Triangles, Vertices);
-      [IsolatedVertices, PinchedOff, Holes] = CheckSurface(tr);
+      [IsolatedVertices, PinchedOff, Holes, SurfaceSummaryInfo] = CheckSurface(tr);
 %}
 %
 % MODIFICATION HISTORY:
@@ -27,7 +27,7 @@
 %                        there...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [IsolatedVertices, PinchedOff, Holes] = CheckSurface(tr)
+function [IsolatedVertices, PinchedOff, Holes, SurfaceSummaryInfo] = CheckSurface(tr)
   IsolatedVertices = [];
   PinchedOff = []; % Identified by vertex indices specifying edge
   Holes = []; % Identified by vertex indices specifying edge
