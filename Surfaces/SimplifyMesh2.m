@@ -25,21 +25,20 @@ function [Vertices Triangles] = SimplifyMesh2(tr, DownsampleTo, OnlyEdgesLessTha
    DownsampleTo = 2^nextpow2(length(tr.X)/(2+eps)); %next lower power of 2
  end
  if nargin < 3,
-   OnlyEdgesLessThan = 4; %mm
+   OnlyEdgesLessThan = 2; %mm
  end
  
 %%
  SurfaceEdges = edges(tr);
- NumberOfEdges = length(SurfaceEdges);
  Vertices  = tr.X;
- NumberOfVertices = size(tr.X,1);
  Triangles = tr.Triangulation;
+ NumberOfVertices = size(Vertices,1);
+ NumberOfEdges = length(SurfaceEdges);
    
-%% Find edges to collapse
- EdgeLengths = zeros(1,NumberOfEdges); 
- for k = 1:NumberOfEdges,
-   EdgeLengths(1,k) = dis(tr.X(SurfaceEdges(k,1),:).',tr.X(SurfaceEdges(k,2),:).');
- end
+%% Compute edge lengths
+EdgeLengths  = sqrt(sum( (Vertices(SurfaceEdges(:, 1),:) - Vertices(SurfaceEdges(:, 2),:)).^2, 2));
+ 
+ %% Find edges to collapse
  [sEL,iEL] = sort(EdgeLengths);
 
  Short  = find(sEL>OnlyEdgesLessThan, 1); %mm
