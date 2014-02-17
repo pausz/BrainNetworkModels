@@ -813,7 +813,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          
                             
      %Load the connectivity matrix data
-     load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_04022014.mat']); %Contains: 83 and 1015 ROIs connectomes
+     load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_04022014_corrected.mat']); %Contains: 83 and 1015 ROIs connectomes
 
      %Load centroids - region centres
      load(['ConnectivityData' Sep 'EPFL_centroids_04022014.mat']);
@@ -859,6 +859,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          Connectivity.delay(Connectivity.weights==0) = 0;
          %Get subject ID to use it in the name of the directory
          Connectivity.WhichSubject = code(Connectivity.subject);
+         Connectivity.WhichSubject = Connectivity.WhichSubject{1};
          
      end
      
@@ -949,7 +950,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
      Connectivity.LeftNodes(1:floor(Connectivity.NumberOfNodes/2)) = 0;
      
      % extra info
-     Connectivity.centres = 'T1_subjects_space'
+     Connectivity.centres = 'T1_subjects_space';
 
      
    otherwise
