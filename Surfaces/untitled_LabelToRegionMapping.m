@@ -24,17 +24,3 @@ for i=43:76,
     RegionMapping_lh(Index,1) = i-8;
     
 end
-
-
-%% 
-
-p=patch('Faces', Surface.tr.Triangulation(1:1:end,:) , 'Vertices', Surface.tr.X, ...
-    'Edgecolor','interp', 'FaceColor', 'flat', 'FaceVertexCData', RegionMapping_lh, 'EdgeColor','none','FaceAlpha',1);
-
-set(p,'FaceVertexCData',RegionMapping_lh);
-daspect([1 1 1]);
-view([90 90]); % sets the viewpoint to the Cartesian coordinates x, y, and z
-camlight;     % creates a light right and up from camera
-colormap cool;
-lighting gouraud; % specify lighting algorithm
-axis off;
