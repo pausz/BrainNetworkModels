@@ -35,7 +35,7 @@
 %}
 % MODIFICATION HISTORY:
 %     Alessandra Griffa -- Original.
-%     XX(dd-mm-yyyy)   -- git.
+%     XX(dd-mm-yyyy)    -- git.
 
 function [h, vIndex_rh, vIndex_lh] = GetLabelMapping(path_surf_rh, base_path_annot_rh, path_surf_lh, base_path_annot_lh, addview, CM, llist)
 
