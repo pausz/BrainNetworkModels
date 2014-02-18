@@ -5,7 +5,7 @@
 % ARGUMENTS: 
 %           Surface --    a structure containing the options, specific to
 %                          each mesh. The options common to all
-%                          connectivities are:
+%                          meshes are:
 %
 %               .WhichMesh --  A string specifying the surface to
 %                              be loaded. 
@@ -38,8 +38,9 @@
 %{
      
   %Specify bi-hemispheric mesh first patient: PH0036.pial
-   Surface.WhichMesh = 'PH0036';
-   Surface.hemisphere = 'bh';
+   Surface.WhichSubject = 'PH0036';
+   Surface.WhichMesh = 'pial';
+   Surface.hemisphere = 'rh';
 
   %Load it:
    Surface = GetSurface(Surface); 
