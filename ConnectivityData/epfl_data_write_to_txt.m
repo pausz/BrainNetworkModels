@@ -51,7 +51,7 @@ for s=1:40,
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'low';
-    options.Connectivity.WhichSubject = 'average';
+    options.Connectivity.WhichSubject = 'individual';
     options.Connectivity.RemoveThalamus = false;
     options.Connectivity.invel = 1;
     options.Connectivity.subject = s;
@@ -96,7 +96,7 @@ end
     options.Connectivity.subject = 1;
     options.Connectivity = GetConnectivity(options.Connectivity);
     
-    %write_connectivity_to_txt(options.Connectivity)
+    write_connectivity_to_txt(options.Connectivity)
 
 %%
 % parcellation : high
@@ -126,7 +126,7 @@ for s=1:40,
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'high';
-    options.Connectivity.WhichSubject = 'average';
+    options.Connectivity.WhichSubject = 'individual';
     options.Connectivity.RemoveThalamus = false;
     options.Connectivity.invel = 1;
     options.Connectivity.subject = s;
