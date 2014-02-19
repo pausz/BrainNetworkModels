@@ -11,7 +11,7 @@
 % subject      : average 
 % subcortical  : true
 % brainstem    : false
-% yields       : 82ROIs matrix
+% yields       : 82 ROIs matrix
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'low';
@@ -28,7 +28,7 @@
 % subject      : average 
 % subcortical  : false
 % brainstem    : false
-% yields       : 68ROIs matrix
+% yields       : 68 ROIs matrix
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'low';
@@ -45,7 +45,7 @@
 % subject      : individual 
 % subcortical  : true
 % brainstem    : false
-% yields       : 40 x 68ROIs matrices
+% yields       : 40 x 68 ROIs matrices
 
 for s=1:40,
     
@@ -66,7 +66,7 @@ end
 % subject      : individual 
 % subcortical  : true
 % brainstem    : false
-% yields       : 40 x 828ROIs matrices
+% yields       : 40 x 82 ROIs matrices
 for s=1:40,
     
     options.Connectivity.WhichMatrix = 'EPFL';
@@ -86,7 +86,7 @@ end
 % subject      : average 
 % subcortical  : true
 % brainstem    : false
-% yields       : 82ROIs matrix
+% yields       : 1014 ROIs matrix
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'high';
@@ -103,7 +103,7 @@ end
 % subject      : average 
 % subcortical  : false
 % brainstem    : false
-% yields       : 68ROIs matrix
+% yields       : 1000 ROIs matrix
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'high';
@@ -120,7 +120,7 @@ end
 % subject      : individual 
 % subcortical  : true
 % brainstem    : false
-% yields       : 40 x 68ROIs matrices
+% yields       : 40 x 1000 ROIs matrices
 
 for s=1:40,
     
@@ -141,7 +141,7 @@ end
 % subject      : individual 
 % subcortical  : true
 % brainstem    : false
-% yields       : 40 x 828ROIs matrices
+% yields       : 40 x 1014 ROIs matrices
 for s=1:40,
     
     options.Connectivity.WhichMatrix = 'EPFL';
