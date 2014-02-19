@@ -9,7 +9,6 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 load('EPFL_diffusion_connectivity_data_04022014.mat')
 
 %% clean the 83 ROIs data
@@ -36,7 +35,7 @@ tract_lengths(tract_lengths  > 250)   = 0;   % binarize
 
 % scale density weights so they are in the range [0, 1], but preserve inter
 % subject variability
-weights_density = (weights_density - min(weights_density(:))) / (max(weights_density(:)) - Xmin(weights_density(:))); 
+weights_density = (weights_density - min(weights_density(:))) / (max(weights_density(:)) - min(weights_density(:))); 
 
 SC_density{1} = weights_density;
 SC_number{1}  = weights_number;
