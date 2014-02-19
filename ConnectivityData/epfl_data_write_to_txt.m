@@ -45,7 +45,7 @@
 % subject      : individual 
 % subcortical  : true
 % brainstem    : false
-% yields       : 40 x 68 ROIs matrices
+% yields       : 40 x 82 ROIs matrices
 
 for s=1:40,
     
@@ -66,13 +66,13 @@ end
 % subject      : individual 
 % subcortical  : true
 % brainstem    : false
-% yields       : 40 x 82 ROIs matrices
+% yields       : 40 x 68 ROIs matrices
 for s=1:40,
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'low';
     options.Connectivity.WhichSubject = 'individual';
-    options.Connectivity.RemoveThalamus = false;
+    options.Connectivity.RemoveThalamus = true;
     options.Connectivity.invel = 1;
     options.Connectivity.subject = s;
     options.Connectivity = GetConnectivity(options.Connectivity);
