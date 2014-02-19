@@ -18,7 +18,7 @@
     options.Connectivity.WhichSubject = 'average';
     options.Connectivity.RemoveThalamus = false;
     options.Connectivity.invel = 1;
-    options.Connectivity.subject = s;
+    options.Connectivity.subject = 1;
     options.Connectivity = GetConnectivity(options.Connectivity);
     
     write_connectivity_to_txt(options.Connectivity)
@@ -35,7 +35,7 @@
     options.Connectivity.WhichSubject = 'average';
     options.Connectivity.RemoveThalamus = true;
     options.Connectivity.invel = 1;
-    options.Connectivity.subject = s;
+    options.Connectivity.subject = 1;
     options.Connectivity = GetConnectivity(options.Connectivity);
     
     write_connectivity_to_txt(options.Connectivity)
@@ -93,10 +93,10 @@ end
     options.Connectivity.WhichSubject = 'average';
     options.Connectivity.RemoveThalamus = false;
     options.Connectivity.invel = 1;
-    options.Connectivity.subject = s;
+    options.Connectivity.subject = 1;
     options.Connectivity = GetConnectivity(options.Connectivity);
     
-    write_connectivity_to_txt(options.Connectivity)
+    %write_connectivity_to_txt(options.Connectivity)
 
 %%
 % parcellation : high
@@ -110,7 +110,7 @@ end
     options.Connectivity.WhichSubject = 'average';
     options.Connectivity.RemoveThalamus = true;
     options.Connectivity.invel = 1;
-    options.Connectivity.subject = s;
+    options.Connectivity.subject = 1;
     options.Connectivity = GetConnectivity(options.Connectivity);
     
     write_connectivity_to_txt(options.Connectivity)
