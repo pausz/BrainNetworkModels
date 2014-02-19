@@ -903,11 +903,11 @@ function [Connectivity] = GetConnectivity(Connectivity)
          Connectivity.NodeStr(42) = [];
          Connectivity.NodeStrIntuitive(42) = [];
          
-         for j = 1:ceil(Connectivity.NumberOfNodes/2),
+         for j = 1:floor(Connectivity.NumberOfNodes/2),
            Connectivity.NodeStr{j} = ['r' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
            Connectivity.NodeStrIntuitive{j} = [Connectivity.NodeStr{j} ': ' Connectivity.NodeStrIntuitive{j}]; %Prepend with r for right hemisphere
          end
-         for j = (ceil(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
+         for j = (floor(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
            Connectivity.NodeStr{j} = ['l' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
            Connectivity.NodeStrIntuitive{j} = [Connectivity.NodeStr{j} ': ' Connectivity.NodeStrIntuitive{j}];  
          end
