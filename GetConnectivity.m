@@ -894,7 +894,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
                              'BSTS', 'ST', 'TT', 'INS', 'THAL', 'CAU', ...
                              'PUT', 'PALL', 'NACC', 'HC', 'AMYG', 'BS'};
                          
-         Connectivity.NodeStr = [Connectivity.NodeStr ; Connectivity.NodeStr];
+         Connectivity.NodeStr = [Connectivity.NodeStr  Connectivity.NodeStr];
          % Human readable labels
          Connectivity.NodeStrIntuitive = importdata(['ConnectivityData' Sep 'EPFL_NodeStrIntuitive_04022014.txt']);
          Connectivity.NodeStrIntuitive = [Connectivity.NodeStrIntuitive ; Connectivity.NodeStrIntuitive];
