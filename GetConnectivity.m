@@ -872,10 +872,10 @@ function [Connectivity] = GetConnectivity(Connectivity)
          Connectivity.ThalamicNodes = not(str2num(cell2mat(temp.textdata(2:end, 3))));
          
          for j = 1:ceil(Connectivity.NumberOfNodes/2),
-           Connectivity.NodeStr{j} = ['r' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
+           Connectivity.NodeStr{j} = ['r_' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
          end
          for j = (ceil(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
-           Connectivity.NodeStr{j} = ['l' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
+           Connectivity.NodeStr{j} = ['l_' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
          end
          
          Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
