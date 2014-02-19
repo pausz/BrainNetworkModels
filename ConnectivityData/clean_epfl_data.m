@@ -30,13 +30,16 @@ weights_density(idx3) = 0;
 weights_number(idx3) = 0; 
 
 % get rid of lengths and connections for d > 250 mm
-weights_density(tract_lengths > 250) = 0;
-weights_number(tract_lengths > 250) = 0;
-tract_lengths(tract_lengths > 250)   = 0;   % binarize
+weights_density(tract_lengths > 250)  = 0;
+weights_number(tract_lengths  > 250)  = 0;
+tract_lengths(tract_lengths  > 250)   = 0;   % binarize
 
-% 
+% scale density weights so they are in the range [0, 1], but preserve inter
+% subject variability
+weights_density = (weights_density - min(weights_density(:))) / (max(weights_density(:)) - Xmin(weights_density(:))); 
+
 SC_density{1} = weights_density;
-SC_number{1} = weights_number;
+SC_number{1}  = weights_number;
 L{1} = tract_lengths; 
 
 %% clean the 1015 ROIs data
@@ -57,13 +60,18 @@ weights_number(idx3) = 0;
 
 % get rid of lengths and connections for d > 250 mm
 weights_density(tract_lengths > 250) = 0;
-weights_number(tract_lengths > 250) = 0;
-tract_lengths(tract_lengths > 250)   = 0;   % binarize
+weights_number(tract_lengths  > 250) = 0;
+tract_lengths(tract_lengths   > 250) = 0;   % binarize
 
 % 
+% scale density weights so they are in the range [0, 1], but preserve inter
+% subject variability
+weights_density = (weights_density - min(weights_density(:))) / (max(weights_density(:)) - Xmin(weights_density(:))); 
+
 SC_density{2} = weights_density;
-SC_number{2} = weights_number;
+SC_number{2}  = weights_number;
 L{2} = tract_lengths; 
+%% 
 
 %% save
 
