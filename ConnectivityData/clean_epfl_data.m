@@ -65,7 +65,9 @@ tract_lengths(tract_lengths   > 250) = 0;   % binarize
 % 
 % scale density weights so they are in the range [0, 1], but preserve inter
 % subject variability
-weights_density = (weights_density - min(weights_density(:))) / (max(weights_density(:)) - Xmin(weights_density(:))); 
+min_min = min(weights_density(:));
+max_max = max(weights_density(:));
+weights_density = (weights_density - min_min) ./ (max_max - min_min); 
 
 SC_density{2} = weights_density;
 SC_number{2}  = weights_number;
