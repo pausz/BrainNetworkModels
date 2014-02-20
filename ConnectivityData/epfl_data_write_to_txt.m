@@ -122,7 +122,7 @@ end
 % brainstem    : false
 % yields       : 40 x 1014 ROIs matrices
 
-for s=1:40,
+for s=26:40,
     
     options.Connectivity.WhichMatrix = 'EPFL';
     options.Connectivity.Parcellation = 'high';
