@@ -9,8 +9,7 @@ RegionMapping_lh = zeros(length(lm_lh), 1);
 for i=2:35,
     
     StringToFind = labels_file.textdata{i, 2};
-    IndexCells = strcmp(lm_rh, StringToFind); % find the cells that contain StringToFind
-    %Index      = find(not(cellfun('isempty', IndexCells))); % get the indices
+    IndexCells = strcmp(lm_rh, StringToFind); 
     RegionMapping_rh(IndexCells,1) = i-1;
     
 end
@@ -19,8 +18,7 @@ end
 for i=43:76,
     
     StringToFind = labels_file.textdata{i, 2};
-    IndexCells = strcmp(lm_lh, StringToFind); % find the cells that contain StringToFind
-    %Index      = find(not(cellfun('isempty', IndexCells))); % get the indices
+    IndexCells = strcmp(lm_lh, StringToFind); 
     RegionMapping_lh(IndexCells,1) = i-8;
     
 end
