@@ -9,71 +9,41 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-load('EPFL_diffusion_connectivity_data_04022014.mat')
-
-%% clean the 83 ROIs data
+load('EPFL_diffusion_connectivity_data_07032014_5scales.mat')
 
 
-weights_density = SC_density{1};
-weights_number  = SC_number{1};
-tract_lengths = L{1}; 
+% Heuristic to clean 'spurious connections'
+connection_threshold = [0.7, 0.65, 0.60, 0.55, 0.5] * 40;
 
-% get rid of connections that are not present in 75% of the group
-weights_density(weights_density > 0) = 1;  % binarize
-weights_density_sum = sum(weights_density, 3);
-idx = weights_density_sum < 30 ;
-idx3 = repmat(idx, [1 1 40]);
+for scale=1:5,
 
-weights_density = SC_density{1};
-weights_density(idx3) = 0;
-weights_number(idx3) = 0; 
+    % get rid of 'spurious' connections
+    weights_density = SC_density{scale};
+    weights_number  = SC_number{scale};
+    tract_lengths = L{scale}; 
+    
+    weights_density_sum = sum(weights_density ~=0, 3);
+    idx  = weights_density_sum < connection_threshold(scale) ;
+    idx3 = repmat(idx, [1 1 40]);
+    
+    weights_density(idx3) = 0;
+    weights_number(idx3)  = 0; 
 
-% get rid of lengths and connections for d > 250 mm
-weights_density(tract_lengths > 250)  = 0;
-weights_number(tract_lengths  > 250)  = 0;
-tract_lengths(tract_lengths  > 250)   = 0;   % binarize
+    % get rid of lengths and connections for d > 255 mm
+    weights_density(tract_lengths > 255)   = 0;
+    weights_number(tract_lengths  > 255)   = 0;
+    tract_lengths(tract_lengths   > 255)   = 0; 
 
-% scale density weights so they are in the range [0, 1], but preserve inter
-% subject variability
-weights_density = (weights_density - min(weights_density(:))) / (max(weights_density(:)) - min(weights_density(:))); 
+    % scale density weights so they are in the range [0, 1], but preserve inter
+    % subject variability?
+    % weights_density = (weights_density - min(weights_density(:))) / (max(weights_density(:)) - min(weights_density(:))); 
 
-SC_density{1} = weights_density;
-SC_number{1}  = weights_number;
-L{1} = tract_lengths; 
-
-%% clean the 1015 ROIs data
-
-weights_density = SC_density{2};
-weights_number  = SC_number{2};
-tract_lengths   = L{2}; 
-
-% get rid of connections that are not present in 50% of the group
-weights_density(weights_density > 0) = 1;  % binarize
-weights_density_sum = sum(weights_density, 3);
-idx  = weights_density_sum < 20 ;
-idx3 = repmat(idx, [1 1 40]);
-
-weights_density = SC_density{2};
-weights_density(idx3) = 0; 
-weights_number(idx3) = 0; 
-
-% get rid of lengths and connections for d > 250 mm
-weights_density(tract_lengths > 250) = 0;
-weights_number(tract_lengths  > 250) = 0;
-tract_lengths(tract_lengths   > 250) = 0;   % binarize
-
-% 
-% scale density weights so they are in the range [0, 1], but preserve inter
-% subject variability
-min_min = min(weights_density(:));
-max_max = max(weights_density(:));
-weights_density = (weights_density - min_min) ./ (max_max - min_min); 
-
-SC_density{2} = weights_density;
-SC_number{2}  = weights_number;
-L{2} = tract_lengths; 
+    SC_density{scale} = weights_density;
+    SC_number{scale}  = weights_number;
+    L{scale} = tract_lengths; 
+end
 %% 
 
 %% save
 
-save('EPFL_diffusion_connectivity_data_04022014_corrected.mat', 'L', 'SC_density', 'SC_number', 'age', 'code', 'gender')
+save('EPFL_diffusion_connectivity_data_07032014_5scales_corrected.mat', 'L', 'SC_density', 'SC_number', 'age', 'code', 'gender')
