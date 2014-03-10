@@ -813,6 +813,9 @@ function [Connectivity] = GetConnectivity(Connectivity)
 
      %Load centroids - region centres
      load(['ConnectivityData' Sep 'EPFL_centroids_04022014.mat']);
+     
+     %Load region labels (intuitive names)
+     load(['ConnectivityData' Sep 'labels_Lausanne2008_all_scales.mat']);
 
      
      switch Connectivity.WhichWeights, 
@@ -834,7 +837,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          % compute an average subject
          
          % Region centres
-         Connectivity.Position = mean(centroids{Connectivity.position_idx}(:, :, :), 3);
+         Connectivity.Position = mean(centroids{Connectivity.Parcellation}(:, :, :), 3);
          Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
 
          % Compute delay matrix
@@ -861,65 +864,44 @@ function [Connectivity] = GetConnectivity(Connectivity)
      
      
      switch Connectivity.Parcellation
-         case 5 % 1015 ROIs
-            temp = importdata(['ConnectivityData' Sep 'EPFL_1015ROIs.txt']);
-            Connectivity.NodeStr = temp.textdata(2:end,2);
-            Connectivity.ThalamicNodes = not(str2num(cell2mat(temp.textdata(2:end, 3))));
+         case {1, 2, 3, 4, 5} 
+            
+            rh_labels = labels.rh{Connectivity.Parcellation};
+            lh_labels = labels.lh{Connectivity.Parcellation};
          
-            for j = 1:ceil(Connectivity.NumberOfNodes/2),
-                Connectivity.NodeStr{j} = ['r_' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
+            for j = 1:length(rh_labels),
+                Connectivity.NodeStr{j} = ['r_' rh_labels{j}]; %Prepend with r for right hemisphere
             end
-            for j = (ceil(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
-                Connectivity.NodeStr{j} = ['l_' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
+            for j = length(rh_labels):length(rh_labels) + length(lh_labels),
+                Connectivity.NodeStr{j} = ['l_' Connectivity.NodeStr{j-length(rh_labels)+1}]; %Prepend with l for left hemisphere
             end
          
             Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
          
-         case 4 % 463 ROIs
-             temp = importdata(['ConnectivityData' Sep 'EPFL_463ROIs.txt']);
+            rh_thal = ones(length(rh_labels), 1);
+            rh_thal(1:end-7) = 0;
             
-         case 3 % 234 ROIs 
-             temp = importdata(['ConnectivityData' Sep 'EPFL_234ROIs.txt']);
+            lh_thal = ones(length(lh_labels), 1);
+            lh_thal(1:end-8) = 0;
+            %brainstem
+            lh_thal(end)=1;
+            
+         Connectivity.ThalamicNodes = [rh_thal; lh_thal];
+         Connectivity.BrainStemNodes = length(Connectivity.ThalamicNodes);
          
-         case 2 % 129 ROIs
-             temp = importdata(['ConnectivityData' Sep 'EPFL_129ROIs.txt']);
-                        
-         case 1 % 83 ROIs
-             
-         temp = importdata(['ConnectivityData' Sep 'EPFL_83ROIs.txt']);
-         Connectivity.ThalamicNodes = not(temp.data);
-         
-         Connectivity.NodeStr = {'LOF', 'PORB', 'FP', 'MOF', 'PTRI', 'POPE', ...
-                             'RMF', 'SF', 'CMF', 'PREC', 'PARC', 'RAC', ...
-                             'CAC', 'PC', 'ISTC', 'PSTS', 'SMAR', 'SP', ...
-                             'IP', 'PCUN', 'CUN', 'PCAL', 'LOCC', 'LING', ...
-                             'FUS', 'PARH', 'ENT', 'TP', 'IT', 'MT', ...
-                             'BSTS', 'ST', 'TT', 'INS', 'THAL', 'CAU', ...
-                             'PUT', 'PALL', 'NACC', 'HC', 'AMYG', 'BS'};
-                         
-         Connectivity.NodeStr = [Connectivity.NodeStr  Connectivity.NodeStr];
-         % Human readable labels
-         Connectivity.NodeStrIntuitive = importdata(['ConnectivityData' Sep 'EPFL_NodeStrIntuitive_04022014.txt']);
-         Connectivity.NodeStrIntuitive = [Connectivity.NodeStrIntuitive ; Connectivity.NodeStrIntuitive];
-         
-         %Delete duplicate BrainStem
-         Connectivity.NodeStr(42) = [];
-         Connectivity.NodeStrIntuitive(42) = [];
-         
-         for j = 1:floor(Connectivity.NumberOfNodes/2),
-           Connectivity.NodeStr{j} = ['r' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
-           Connectivity.NodeStrIntuitive{j} = [Connectivity.NodeStr{j} ': ' Connectivity.NodeStrIntuitive{j}]; %Prepend with r for right hemisphere
-         end
-         for j = (floor(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
-           Connectivity.NodeStr{j} = ['l' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
-           Connectivity.NodeStrIntuitive{j} = [Connectivity.NodeStr{j} ': ' Connectivity.NodeStrIntuitive{j}];  
-         end
+%          Connectivity.NodeStr = {'LOF', 'PORB', 'FP', 'MOF', 'PTRI', 'POPE', ...
+%                              'RMF', 'SF', 'CMF', 'PREC', 'PARC', 'RAC', ...
+%                              'CAC', 'PC', 'ISTC', 'PSTS', 'SMAR', 'SP', ...
+%                              'IP', 'PCUN', 'CUN', 'PCAL', 'LOCC', 'LING', ...
+%                              'FUS', 'PARH', 'ENT', 'TP', 'IT', 'MT', ...
+%                              'BSTS', 'ST', 'TT', 'INS', 'THAL', 'CAU', ...
+%                              'PUT', 'PALL', 'NACC', 'HC', 'AMYG', 'BS'};
                          
          otherwise
              error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['Parcellation for EPFL must be either ''high'' or ''low''. You requested ''' Connectivity.WhichWeights '''.']);
      end
      
-     
+     % Remove thalamic nodes
      if Connectivity.RemoveThalamus
          NodesToRemove = find(Connectivity.ThalamicNodes);
          Connectivity.weights(NodesToRemove, :) = [];
@@ -934,6 +916,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
              
      end
      
+     % Remove brainstem node
      if Connectivity.RemoveBrainStem
          Connectivity.weights(end, :) = [];
          Connectivity.weights(:, end) = [];
