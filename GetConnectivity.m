@@ -30,8 +30,8 @@
 %                                Possible values = {'resampled', 'fbden'};
 %
 %            'EPFL'        :
-%              .Parcellation -- Default = 'high';
-%                               Possible values = {'high', 'low'};
+%              .Parcellation -- Default = 1;
+%                               Possible values = 1:5;
 %              .WhichWeights -- Default = 'fbden';
 %                               Possible values = {'fbden', 'fbcount'}
 %              .hemisphere   -- Which brain hemisphere/s to include. 
@@ -765,15 +765,15 @@ function [Connectivity] = GetConnectivity(Connectivity)
         Connectivity.NumberOfNodes = length(Connectivity.NodeStr);       %Reset N for cortex only matrix...
       end
      
-   %---------------------------------------------------------------% 
-   
+   %-----------------------------------------------------------------------% 
+   %-----------------------------------------------------------------------% 
     case 'EPFL'
       if ~isfield(Connectivity,'invel'),
        Connectivity.invel = 1.0; %%must be either a single number or vec(1,N)
       end
      
      if ~isfield(Connectivity,'Parcellation'),
-       Connectivity.Parcellation = 'high';  %Load high resolution matrix
+       Connectivity.Parcellation = 1;  %Load high resolution matrix
      end
      if ~isfield(Connectivity,'WhichWeights'),
        Connectivity.WhichWeights = 'fbden'; %Use fiber density weights
@@ -803,17 +803,13 @@ function [Connectivity] = GetConnectivity(Connectivity)
        error(strcat('BrainNetworkModels:', mfilename,':NotImplemented'), ['Haven''t implemented split into hemispheres yet ...']);
      end
      
-     if strcmp(Connectivity.Parcellation, 'high')
-       Connectivity.weights_idx  = 2;
-       Connectivity.position_idx = 5;
-     else 
-       Connectivity.weights_idx  = 1;
-       Connectivity.position_idx = 1;
-     end
+     
+     Connectivity.weights_idx  = Connectivity.Parcellation;
+     Connectivity.position_idx = Connectivity.Parcellation;
          
                             
      %Load the connectivity matrix data
-     load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_04022014_corrected.mat']); %Contains: 83 and 1015 ROIs connectomes
+     load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_07032014_5scales_corrected.mat']); %Contains: 83 and 1015 ROIs connectomes
 
      %Load centroids - region centres
      load(['ConnectivityData' Sep 'EPFL_centroids_04022014.mat']);
@@ -821,10 +817,10 @@ function [Connectivity] = GetConnectivity(Connectivity)
      
      switch Connectivity.WhichWeights, 
        case 'fbden' 
-         Connectivity.weights  = SC_density{Connectivity.weights_idx}(:, :, Connectivity.subject);
+         Connectivity.weights  = SC_density{Connectivity.Parcellation}(:, :, Connectivity.subject);
        case 'fbcount'
          % rescale 
-         Connectivity.weights  = log(SC_number{Connectivity.weights_idx}(:, :, Connectivity.subject));
+         Connectivity.weights  = log(SC_number{Connectivity.Parcellation}(:, :, Connectivity.subject));
        otherwise
          error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['WhichWeights for EPFL must be either ''fbcount'' or ''fbden''. You requested ''' Connectivity.WhichWeights '''.']);
      end
@@ -843,19 +839,19 @@ function [Connectivity] = GetConnectivity(Connectivity)
 
          % Compute delay matrix
          Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
-         Connectivity.delay = Connectivity.invel.*mean(L{Connectivity.weights_idx}(:, :, :), 3);
+         Connectivity.delay = Connectivity.invel.*mean(L{Connectivity.Parcellation}(:, :, :), 3);
          Connectivity.delay(Connectivity.weights==0) = 0;
          
          case 'individual'
              
          % Region centres
-         Connectivity.Position = centroids{Connectivity.position_idx}(:, :, Connectivity.subject);
+         Connectivity.Position = centroids{Connectivity.Parcellation}(:, :, Connectivity.subject);
          Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
 
 
          % Compute delay matrix
          Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
-         Connectivity.delay = Connectivity.invel.*L{Connectivity.weights_idx}(:, :, Connectivity.subject);
+         Connectivity.delay = Connectivity.invel.*L{Connectivity.Parcellation}(:, :, Connectivity.subject);
          Connectivity.delay(Connectivity.weights==0) = 0;
          %Get subject ID to use it in the name of the directory
          Connectivity.WhichSubject = code(Connectivity.subject);
@@ -865,23 +861,30 @@ function [Connectivity] = GetConnectivity(Connectivity)
      
      
      switch Connectivity.Parcellation
-         case 'high'
+         case 5 % 1015 ROIs
+            temp = importdata(['ConnectivityData' Sep 'EPFL_1015ROIs.txt']);
+            Connectivity.NodeStr = temp.textdata(2:end,2);
+            Connectivity.ThalamicNodes = not(str2num(cell2mat(temp.textdata(2:end, 3))));
          
-         temp = importdata(['ConnectivityData' Sep 'EPFL_1015ROIs.txt']);
-         Connectivity.NodeStr = temp.textdata(2:end,2);
-         Connectivity.ThalamicNodes = not(str2num(cell2mat(temp.textdata(2:end, 3))));
+            for j = 1:ceil(Connectivity.NumberOfNodes/2),
+                Connectivity.NodeStr{j} = ['r_' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
+            end
+            for j = (ceil(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
+                Connectivity.NodeStr{j} = ['l_' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
+            end
          
-         for j = 1:ceil(Connectivity.NumberOfNodes/2),
-           Connectivity.NodeStr{j} = ['r_' Connectivity.NodeStr{j}]; %Prepend with r for right hemisphere
-         end
-         for j = (ceil(Connectivity.NumberOfNodes/2) + 1):length(Connectivity.NodeStr)-1,
-           Connectivity.NodeStr{j} = ['l_' Connectivity.NodeStr{j}]; %Prepend with l for left hemisphere
-         end
+            Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
          
-         Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
-             
-             
-         case 'low'
+         case 4 % 463 ROIs
+             temp = importdata(['ConnectivityData' Sep 'EPFL_463ROIs.txt']);
+            
+         case 3 % 234 ROIs 
+             temp = importdata(['ConnectivityData' Sep 'EPFL_234ROIs.txt']);
+         
+         case 2 % 129 ROIs
+             temp = importdata(['ConnectivityData' Sep 'EPFL_129ROIs.txt']);
+                        
+         case 1 % 83 ROIs
              
          temp = importdata(['ConnectivityData' Sep 'EPFL_83ROIs.txt']);
          Connectivity.ThalamicNodes = not(temp.data);
