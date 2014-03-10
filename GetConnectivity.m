@@ -932,7 +932,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
             lh_thal = ones(length(lh_labels)+1, 1);
             lh_thal(1:end-8) = 0;
             %brainstem
-            lh_thal(end)=1;
+            lh_thal(end)=0;
             
          Connectivity.ThalamicNodes = [rh_thal; lh_thal];
          Connectivity.BrainStemNodes = length(Connectivity.ThalamicNodes);
