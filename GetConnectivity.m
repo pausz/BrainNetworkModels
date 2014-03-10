@@ -819,18 +819,47 @@ function [Connectivity] = GetConnectivity(Connectivity)
 
      
      switch Connectivity.WhichWeights, 
-       case 'fbden' 
-         Connectivity.weights  = SC_density{Connectivity.Parcellation}(:, :, Connectivity.subject);
+       case 'fbden'
+          temp_number_of_nodes  = size(SC_density{Connectivity.Parcellation},1) +2;
+          temp_weights = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+          temp_weights(1:end-2, 1:end-2, :) = SC_density{Connectivity.Parcellation};
+          
+          temp_delay= zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+          temp_delay(1:end-2, 1:end-2, :) = L{Connectivity.Parcellation};
+          
        case 'fbcount'
-         % rescale 
-         Connectivity.weights  = log(SC_number{Connectivity.Parcellation}(:, :, Connectivity.subject));
+          temp_number_of_nodes  = size(SC_number{Connectivity.Parcellation},1) +2;
+          temp_weights = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+          temp_weights(1:end-2, 1:end-2, :) = SC_number{Connectivity.Parcellation};
+          
+          temp_delay= zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+          temp_delay(1:end-2, 1:end-2, :) = L{Connectivity.Parcellation};
        otherwise
          error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['WhichWeights for EPFL must be either ''fbcount'' or ''fbden''. You requested ''' Connectivity.WhichWeights '''.']);
      end
      
-     
-         Connectivity.ThalamicNodes = [];
+         %Anatomical labels        
+         rh_labels = labels.rh{Connectivity.Parcellation};
+         lh_labels = labels.lh{Connectivity.Parcellation};
+         
+
+         Connectivity.weights  = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+         Connectivity.delay    = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+         
+         rh_cortical_rois = length(rh_labels)-7;
+         order_index = [1:rh_cortical_rois temp_number_of_nodes-1, ... 
+                        length(rh_labels)-6:length(rh_labels), ...
+                        length(rh_labels)+1:length(rh_labels)+rh_cortical_rois temp_number_of_nodes, ...
+                        length(rh_labels)+1+rh_cortical_rois:length(rh_labels)+1+rh_cortical_rois+7];
+
+         Connectivity.weights  = temp_weights(order_index, order_index, :);
+         Connectivity.delay    = temp_delay(order_index, order_index, :);
+         
+         Connectivity.ThalamicNodes  = [];
          Connectivity.BrainStemNodes = [];
+         
+         
+         
      
      switch Connectivity.WhichSubject,
          case 'average'
@@ -864,11 +893,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
      
      
      switch Connectivity.Parcellation
-         case {1, 2, 3, 4, 5} 
-            
-            rh_labels = labels.rh{Connectivity.Parcellation};
-            lh_labels = labels.lh{Connectivity.Parcellation};
-        
+         case {1, 2, 3, 4, 5}     
             %---------------------- Right hemisphere----------------------%
             % Cortical Labels
             for j = 1:length(rh_labels)-7,
