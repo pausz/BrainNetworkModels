@@ -868,20 +868,43 @@ function [Connectivity] = GetConnectivity(Connectivity)
             
             rh_labels = labels.rh{Connectivity.Parcellation};
             lh_labels = labels.lh{Connectivity.Parcellation};
-         
-            for j = 1:length(rh_labels),
+        
+            %---------------------- Right hemisphere----------------------%
+            % Cortical Labels
+            for j = 1:length(rh_labels)-7,
                 Connectivity.NodeStr{j} = ['r_' rh_labels{j}]; %Prepend with r for right hemisphere
             end
-            for j = length(rh_labels):length(rh_labels) + length(lh_labels),
-                Connectivity.NodeStr{j} = ['l_' Connectivity.NodeStr{j-length(rh_labels)+1}]; %Prepend with l for left hemisphere
+            
+            % Fake area
+            Connectivity.NodeStr{length(rh_labels)-6} = 'r_corpuscallosum';
+            
+            % Subcortical structures
+            for j = length(rh_labels)-6:length(rh_labels),
+                Connectivity.NodeStr{j+1} = ['r_' rh_labels{j}]; 
             end
-         
+            
+            rh_length = length(Connectivity.NodeStr);
+            %---------------------- Left hemisphere----------------------%
+            % Cortical Labels
+            for j = 1:length(lh_labels)-8,
+                Connectivity.NodeStr{j+rh_length} = ['l_' lh_labels{j}]; %Prepend with l for left hemisphere
+            end
+            % Fake area
+            Connectivity.NodeStr{length(Connectivity.NodeStr)+1} = 'l_corpuscallosum';
+            
+            
+            % Subcortical structures
+            node_length = length(Connectivity.NodeStr);
+            for j = 1:8,
+                Connectivity.NodeStr{j+node_length} = ['l_' lh_labels{end-(8-j)}];
+            end
+            
             Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
          
-            rh_thal = ones(length(rh_labels), 1);
+            rh_thal = ones(length(rh_labels)+1, 1);
             rh_thal(1:end-7) = 0;
             
-            lh_thal = ones(length(lh_labels), 1);
+            lh_thal = ones(length(lh_labels)+1, 1);
             lh_thal(1:end-8) = 0;
             %brainstem
             lh_thal(end)=1;
@@ -898,7 +921,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
 %                              'PUT', 'PALL', 'NACC', 'HC', 'AMYG', 'BS'};
                          
          otherwise
-             error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['Parcellation for EPFL must be either ''high'' or ''low''. You requested ''' Connectivity.WhichWeights '''.']);
+             error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['Parcellation for EPFL must be either 1, 2, 3, 4, 5. You requested ''' Connectivity.WhichWeights '''.']);
      end
      
      % Remove thalamic nodes
