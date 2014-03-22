@@ -867,8 +867,6 @@ function [Connectivity] = GetConnectivity(Connectivity)
          rh_labels = labels.rh{Connectivity.Parcellation};
          lh_labels = labels.lh{Connectivity.Parcellation};
          
-         Connectivity.weights  = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
-         Connectivity.delay    = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
          
          rh_cortical_rois = length(rh_labels)-7;
          % If we add the corpus callosum, then we'll append it after the cortical
@@ -882,9 +880,6 @@ function [Connectivity] = GetConnectivity(Connectivity)
              order_index = 1:temp_number_of_nodes;
          end
 
-         Connectivity.weights  = temp_weights(order_index, order_index, :);
-         Connectivity.delay    = temp_delay(order_index, order_index, :);
-         Connectivity.Position = temp_centroids(order_index, :, :);
          
          Connectivity.ThalamicNodes  = [];
          Connectivity.BrainStemNodes = [];
@@ -897,21 +892,46 @@ function [Connectivity] = GetConnectivity(Connectivity)
          % compute an average subject
          
          % Region centres
-         Connectivity.Position = mean(Connectivity.Position, 3);
+         Connectivity.weights  = zeros(temp_number_of_nodes, temp_number_of_nodes);
+         Connectivity.delay    = zeros(temp_number_of_nodes, temp_number_of_nodes);
+         
+         temp_weights =  mean(temp_weights, 3);
+         Connectivity.weights  = temp_weights(order_index, order_index);
+         clear temp_weights
+         
+         temp_delay = mean(temp_delay, 3);
+         Connectivity.delay    = temp_delay(order_index, order_index);
+         clear temp_delay
+         
+         temp_centroids = mean(temp_centroids, 3);
+         Connectivity.Position = temp_centroids(order_index, :);
+         clear temp_centroids
+         
          Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
 
          % Compute delay matrix
-         Connectivity.delay = Connectivity.invel.*mean(Connectivity.delay, 3);
-         % Compute weights matrix
-         Connectivity.weights = mean(Connectivity.weights, 3);  
+         Connectivity.delay = Connectivity.invel.*Connectivity.delay;
          Connectivity.delay(Connectivity.weights==0) = 0;
          
 
          
          case 'individual'
-             
+         
+         Connectivity.weights  = zeros(temp_number_of_nodes, temp_number_of_nodes);
+         Connectivity.delay    = zeros(temp_number_of_nodes, temp_number_of_nodes);
+         
+         temp_weights =  temp_weights(:, :, Connectivity.subject);
+         Connectivity.weights  = temp_weights(order_index, order_index);
+         clear temp_weights
+         
+         temp_delay = temp_delay(:, :, Connectivity.subject);
+         Connectivity.delay    = temp_delay(order_index, order_index);
+         clear temp_delay
+         
          % Region centres
-         Connectivity.Position = Connectivity.Position(:, :, Connectivity.subject);
+         temp_centroids = temp_centroids(:,  Connectivity.subject);
+         Connectivity.Position = temp_centroids(order_index);
+         clear temp_centroids
          Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
 
          % Compute delay matrix
