@@ -3,6 +3,7 @@ function write_fanmod_input_files(options)
 %  The third an fourth number denote the vertex colours. Write the results
 %  in an ascii file.
 %
+%
 % ARGUMENTS: 
 %          options.Connectivity -- a structure containing the options, specific to
 %                                  each matrix.
@@ -54,13 +55,35 @@ function write_fanmod_input_files(options)
 
 [sink_nodes, source_nodes] = find(options.Connectivity.weights);
 
+nodecolours = zeros(length(sink_nodes), 4);
+
+% start node
+nodecolours(:, 1) = source_nodes;
+nodecolours(:, 2) = sink_nodes;
+
+for k=1:1:options.Connectivity.NumberOfNodes,
+    nodecolours(source_nodes == k, 3) = options.Connectivity.NodeColours(k);
+    nodecolours(sink_nodes == k, 4)   = options.Connectivity.NodeColours(k);
+    
+end
+
+% node colours consistent with the legend above, plus fanmod expect
+% zero-based indexing.
+nodecolours = nodecolours -1;
+
 
 %% Make the directory
- system(['mkdir ' DirectoryName])
+
+system(['mkdir ' DirectoryName])
  
- fid = fopen([DirectoryName filesep 'fanmod_input.txt'], 'wt');
- fprintf(fid, '%d ', 'nodecolours', '-ASCII');
- flcose(fid);
+fid = fopen([DirectoryName filesep 'fanmod_input.txt'], 'wt');
+for k = 1:length(sink_nodes),
+   fprintf(fid, '%d %d %d %d \n',nodecolours(k,:));
+end
+
+%save([DirectoryName filesep 'fanmod_input.txt'], 'nodecolours', '-ASCII');
+%fprintf(fid, '%d ', nodecolours', '-ASCII');
+fclose(fid);
 
  
 
