@@ -786,6 +786,10 @@ function [Connectivity] = GetConnectivity(Connectivity)
        Connectivity.RemoveBrainStem = true;
      end
      
+     if ~isfield(Connectivity,'AddCorpusCallosum'),
+       Connectivity.AddCorpusCallosum = false;
+     end
+     
      
      if ~isfield(Connectivity,'WhichSubject'),
        Connectivity.WhichSubject = 'individual';
@@ -798,6 +802,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
      if ~isfield(Connectivity,'hemisphere'),
        Connectivity.hemisphere = 'both';
      end
+     
      
      if ~strcmp(Connectivity.hemisphere, 'both'),
        error(strcat('BrainNetworkModels:', mfilename,':NotImplemented'), ['Haven''t implemented split into hemispheres yet ...']);
@@ -816,37 +821,58 @@ function [Connectivity] = GetConnectivity(Connectivity)
      
      %Load region labels (intuitive names)
      load(['ConnectivityData' Sep 'labels_Lausanne2008_all_scales.mat']);
-
+     
+     
+     % Add fake regions representing the corpus callosum - needed for
+     % creating a consistent dataset for surface simulations.
+     if Connectivity.AddCorpusCallosum,
+         temp_number_of_nodes  = size(SC_density{Connectivity.Parcellation},1) +2;
+     else
+         temp_number_of_nodes  = size(SC_density{Connectivity.Parcellation},1);
+     end
+     
+     temp_weights   = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+     temp_delay     = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
+     temp_centroids = zeros(temp_number_of_nodes, 3, 40);
      
      switch Connectivity.WhichWeights, 
        case 'fbden'
-          temp_number_of_nodes  = size(SC_density{Connectivity.Parcellation},1) +2;
-          temp_weights = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
-          temp_weights(1:end-2, 1:end-2, :) = SC_density{Connectivity.Parcellation};
-          
-          temp_delay= zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
-          temp_delay(1:end-2, 1:end-2, :) = L{Connectivity.Parcellation};
+          if Connectivity.AddCorpusCallosum,
+             temp_weights(1:end-2, 1:end-2, :) = SC_density{Connectivity.Parcellation};
+             temp_delay(1:end-2, 1:end-2, :) = L{Connectivity.Parcellation};
+             temp_centroids(1:end-2, :, :) = centroids{Connectivity.Parcellation};
+          else
+             temp_weights = SC_density{Connectivity.Parcellation};
+             temp_delay = L{Connectivity.Parcellation};
+             temp_centroids = centroids{Connectivity.Parcellation};
+          end
           
        case 'fbcount'
-          temp_number_of_nodes  = size(SC_number{Connectivity.Parcellation},1) +2;
-          temp_weights = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
-          temp_weights(1:end-2, 1:end-2, :) = SC_number{Connectivity.Parcellation};
-          
-          temp_delay= zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
-          temp_delay(1:end-2, 1:end-2, :) = L{Connectivity.Parcellation};
+          if Connectivity.AddCorpusCallosum,
+              temp_weights(1:end-2, 1:end-2, :) = SC_number{Connectivity.Parcellation};
+              temp_delay(1:end-2, 1:end-2, :) = L{Connectivity.Parcellation};
+              temp_centroids(1:end-2, :, :) = centroids{Connectivity.Parcellation};
+          else
+              temp_weights = SC_density{Connectivity.Parcellation};
+              temp_delay = L{Connectivity.Parcellation};
+              temp_centroids = centroids{Connectivity.Parcellation};
+          end
+                
        otherwise
          error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['WhichWeights for EPFL must be either ''fbcount'' or ''fbden''. You requested ''' Connectivity.WhichWeights '''.']);
      end
+     
      
          %Anatomical labels        
          rh_labels = labels.rh{Connectivity.Parcellation};
          lh_labels = labels.lh{Connectivity.Parcellation};
          
-
          Connectivity.weights  = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
          Connectivity.delay    = zeros(temp_number_of_nodes, temp_number_of_nodes, 40);
          
          rh_cortical_rois = length(rh_labels)-7;
+         % If we add the corpus callosum, then we'll append it after the cortical
+         % rois
          order_index = [1:rh_cortical_rois temp_number_of_nodes-1, ... 
                         length(rh_labels)-6:length(rh_labels), ...
                         length(rh_labels)+1:length(rh_labels)+rh_cortical_rois temp_number_of_nodes, ...
@@ -854,6 +880,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
 
          Connectivity.weights  = temp_weights(order_index, order_index, :);
          Connectivity.delay    = temp_delay(order_index, order_index, :);
+         Connectivity.Position = temp_centroids(order_index, :);
          
          Connectivity.ThalamicNodes  = [];
          Connectivity.BrainStemNodes = [];
@@ -866,24 +893,24 @@ function [Connectivity] = GetConnectivity(Connectivity)
          % compute an average subject
          
          % Region centres
-         Connectivity.Position = mean(centroids{Connectivity.Parcellation}(:, :, :), 3);
+         Connectivity.Position = mean(Connectivity.Position, 3);
          Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
 
          % Compute delay matrix
-         Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
-         Connectivity.delay = Connectivity.invel.*mean(L{Connectivity.Parcellation}(:, :, :), 3);
+         Connectivity.delay = Connectivity.invel.*mean(Connectivity.delay, 3);
          Connectivity.delay(Connectivity.weights==0) = 0;
+         
+         % Compute weights matrix
+         Connectivity.weights = mean(Connectivity.weights, 3);
          
          case 'individual'
              
          % Region centres
-         Connectivity.Position = centroids{Connectivity.Parcellation}(:, :, Connectivity.subject);
+         Connectivity.Position = Connectivity.Position(:, :, Connectivity.subject);
          Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
 
-
          % Compute delay matrix
-         Connectivity.delay = zeros(Connectivity.NumberOfNodes,Connectivity.NumberOfNodes);
-         Connectivity.delay = Connectivity.invel.*L{Connectivity.Parcellation}(:, :, Connectivity.subject);
+         Connectivity.delay = Connectivity.invel.*Connectivity.delay(:, :, Connectivity.subject);
          Connectivity.delay(Connectivity.weights==0) = 0;
          %Get subject ID to use it in the name of the directory
          Connectivity.WhichSubject = code(Connectivity.subject);
@@ -900,23 +927,31 @@ function [Connectivity] = GetConnectivity(Connectivity)
                 Connectivity.NodeStr{j} = ['r_' rh_labels{j}]; %Prepend with r for right hemisphere
             end
             
-            % Fake area
-            Connectivity.NodeStr{length(rh_labels)-6} = 'r_corpuscallosum';
-            
-            % Subcortical structures
-            for j = length(rh_labels)-6:length(rh_labels),
-                Connectivity.NodeStr{j+1} = ['r_' rh_labels{j}]; 
+            if Connectivity.AddCorpusCallosum,
+                % Fake area
+                Connectivity.NodeStr{length(rh_labels)-6} = 'r_corpuscallosum';
+                % Subcortical structures
+                for j = length(rh_labels)-6:length(rh_labels),
+                    Connectivity.NodeStr{j+1} = ['r_' rh_labels{j}]; 
+                end
+            else 
+                for j = length(rh_labels)-7:length(rh_labels),
+                    Connectivity.NodeStr{j} = ['r_' rh_labels{j}]; 
+                end
+                
             end
-            
+     
             rh_length = length(Connectivity.NodeStr);
             %---------------------- Left hemisphere----------------------%
             % Cortical Labels
             for j = 1:length(lh_labels)-8,
                 Connectivity.NodeStr{j+rh_length} = ['l_' lh_labels{j}]; %Prepend with l for left hemisphere
             end
-            % Fake area
-            Connectivity.NodeStr{length(Connectivity.NodeStr)+1} = 'l_corpuscallosum';
             
+            if Connectivity.AddCorpusCallosum,
+                % Fake area
+                Connectivity.NodeStr{length(Connectivity.NodeStr)+1} = 'l_corpuscallosum';
+            end
             
             % Subcortical structures
             node_length = length(Connectivity.NodeStr);
@@ -926,13 +961,16 @@ function [Connectivity] = GetConnectivity(Connectivity)
             
             Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
          
-            rh_thal = ones(length(rh_labels)+1, 1);
-            rh_thal(1:end-7) = 0;
             
-            lh_thal = ones(length(lh_labels)+1, 1);
+            rh_thal = ones(temp_number_of_nodes, 1);
+            lh_thal = ones(temp_number_of_nodes, 1);
+                
+            rh_thal(1:end-7) = 0;
             lh_thal(1:end-8) = 0;
+            
             %brainstem
             lh_thal(end)=0;
+            
             
          Connectivity.ThalamicNodes = [rh_thal; lh_thal];
          Connectivity.BrainStemNodes = length(Connectivity.ThalamicNodes);
@@ -945,7 +983,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
 %                              'BSTS', 'ST', 'TT', 'INS', 'THAL', 'CAU', ...
 %                              'PUT', 'PALL', 'NACC', 'HC', 'AMYG', 'BS'};
                          
-         otherwise
+        otherwise
              error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['Parcellation for EPFL must be either 1, 2, 3, 4, 5. You requested ''' Connectivity.WhichWeights '''.']);
      end
      
