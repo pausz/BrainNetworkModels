@@ -898,10 +898,11 @@ function [Connectivity] = GetConnectivity(Connectivity)
 
          % Compute delay matrix
          Connectivity.delay = Connectivity.invel.*mean(Connectivity.delay, 3);
+         % Compute weights matrix
+         Connectivity.weights = mean(Connectivity.weights, 3);  
          Connectivity.delay(Connectivity.weights==0) = 0;
          
-         % Compute weights matrix
-         Connectivity.weights = mean(Connectivity.weights, 3);
+
          
          case 'individual'
              
