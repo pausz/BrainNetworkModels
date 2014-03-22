@@ -978,16 +978,16 @@ function [Connectivity] = GetConnectivity(Connectivity)
             lh_thal(end)=0;
             
             % node colours for fanmod
-            rh_node_colours = ones(rh_length, 1);
-            lh_node_colours = 3*ones(temp_number_of_nodes-rh_length, 1);
+            rh_node_colours = 2*ones(rh_length, 1);
+            lh_node_colours = 4*ones(temp_number_of_nodes-rh_length, 1);
             
             % rh_cx = 0 / rh_subcx = 1
-            rh_node_colours(1:end-7) = 0;
+            rh_node_colours(1:end-7) = 1;
             % lh_cx = 2 / rh_subcx = 3
-            lh_node_colours(1:end-8) = 2;
+            lh_node_colours(1:end-8) = 3;
             
              %brainstem
-            lh_node_colours(end)=4;
+            lh_node_colours(end)=5;
             
          Connectivity.ThalamicNodes = [rh_thal; lh_thal];
          Connectivity.BrainStemNodes = length(Connectivity.ThalamicNodes);
