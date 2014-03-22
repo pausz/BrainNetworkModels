@@ -919,7 +919,8 @@ function [Connectivity] = GetConnectivity(Connectivity)
          
      end
      
-     
+     clear temp_weights temp_delay temp_centroids
+
      switch Connectivity.Parcellation
          case {1, 2, 3, 4, 5}     
             %---------------------- Right hemisphere----------------------%
@@ -963,8 +964,8 @@ function [Connectivity] = GetConnectivity(Connectivity)
             Connectivity.NodeStrIntuitive = Connectivity.NodeStr;
          
             
-            rh_thal = ones(temp_number_of_nodes, 1);
-            lh_thal = ones(temp_number_of_nodes, 1);
+            rh_thal = ones(rh_length, 1);
+            lh_thal = ones(temp_number_of_nodes-rh_length, 1);
                 
             rh_thal(1:end-7) = 0;
             lh_thal(1:end-8) = 0;
@@ -972,9 +973,21 @@ function [Connectivity] = GetConnectivity(Connectivity)
             %brainstem
             lh_thal(end)=0;
             
+            % node colours for fanmod
+            rh_node_colours = ones(rh_length, 1);
+            lh_node_colours = 3*ones(temp_number_of_nodes-rh_length, 1);
+            
+            % rh_cx = 0 / rh_subcx = 1
+            rh_node_colours(1:end-7) = 0;
+            % lh_cx = 2 / rh_subcx = 3
+            lh_node_colours(1:end-8) = 2;
+            
+             %brainstem
+            lh_node_colours(end)=4;
             
          Connectivity.ThalamicNodes = [rh_thal; lh_thal];
          Connectivity.BrainStemNodes = length(Connectivity.ThalamicNodes);
+         Connectivity.NodeColours = [rh_node_colours; lh_node_colours];
          
 %          Connectivity.NodeStr = {'LOF', 'PORB', 'FP', 'MOF', 'PTRI', 'POPE', ...
 %                              'RMF', 'SF', 'CMF', 'PREC', 'PARC', 'RAC', ...
@@ -987,6 +1000,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
         otherwise
              error(strcat('BrainNetworkModels:', mfilename,':UnknownWhichWeights'), ['Parcellation for EPFL must be either 1, 2, 3, 4, 5. You requested ''' Connectivity.WhichWeights '''.']);
      end
+     Connectivity.NumberOfNodes = temp_number_of_nodes;
      
      % Remove thalamic nodes
      if Connectivity.RemoveThalamus
@@ -999,8 +1013,8 @@ function [Connectivity] = GetConnectivity(Connectivity)
          Connectivity.NodeStr(NodesToRemove) = [];
          Connectivity.NodeStrIntuitive(NodesToRemove) = [];
          Connectivity.NumberOfNodes = Connectivity.NumberOfNodes - length(NodesToRemove);
-         Connectivity.ThalamicNodes(NodesToRemove) = [];
-             
+         Connectivity.ThalamicNodes(NodesToRemove) = []; 
+         Connectivity.NodeColours(NodesToRemove) = []; 
      end
      
      % Remove brainstem node
@@ -1014,6 +1028,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          Connectivity.NodeStrIntuitive(end) = [];
          Connectivity.NumberOfNodes = Connectivity.NumberOfNodes - 1;
          Connectivity.ThalamicNodes(end) = [];
+         Connectivity.NodeColours(end) = []; 
      end
      
      Connectivity.LeftNodes = ones(Connectivity.NumberOfNodes, 1);
