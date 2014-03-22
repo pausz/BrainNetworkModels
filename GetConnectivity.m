@@ -826,7 +826,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
      % Add fake regions representing the corpus callosum - needed for
      % creating a consistent dataset for surface simulations.
      if Connectivity.AddCorpusCallosum,
-         temp_number_of_nodes  = size(SC_density{Connectivity.Parcellation},1) +2;
+         temp_number_of_nodes  = size(SC_density{Connectivity.Parcellation},1)+2;
      else
          temp_number_of_nodes  = size(SC_density{Connectivity.Parcellation},1);
      end
@@ -873,14 +873,18 @@ function [Connectivity] = GetConnectivity(Connectivity)
          rh_cortical_rois = length(rh_labels)-7;
          % If we add the corpus callosum, then we'll append it after the cortical
          % rois
-         order_index = [1:rh_cortical_rois temp_number_of_nodes-1, ... 
+         if Connectivity.AddCorpusCallosum,
+             order_index = [1:rh_cortical_rois temp_number_of_nodes-1, ... 
                         length(rh_labels)-6:length(rh_labels), ...
                         length(rh_labels)+1:length(rh_labels)+rh_cortical_rois temp_number_of_nodes, ...
                         length(rh_labels)+1+rh_cortical_rois:length(rh_labels)+1+rh_cortical_rois+7];
+         else
+             order_index = 1:temp_number_of_nodes;
+         end
 
          Connectivity.weights  = temp_weights(order_index, order_index, :);
          Connectivity.delay    = temp_delay(order_index, order_index, :);
-         Connectivity.Position = temp_centroids(order_index, :);
+         Connectivity.Position = temp_centroids(order_index, :, :);
          
          Connectivity.ThalamicNodes  = [];
          Connectivity.BrainStemNodes = [];
