@@ -930,7 +930,7 @@ function [Connectivity] = GetConnectivity(Connectivity)
          
          % Region centres
          temp_centroids = temp_centroids(:,  Connectivity.subject);
-         Connectivity.Position = temp_centroids(order_index);
+         Connectivity.Position = temp_centroids(order_index, :, Connectivity.subject);
          clear temp_centroids
          Connectivity.NumberOfNodes = size(Connectivity.weights, 1);
 
