@@ -263,7 +263,7 @@ function Dynamics = SetDynamicParameters(Dynamics)
      
    case {'FHN','FHNtess'}
 %% Default parameters FHN
-     defaults.d     = 1.0; %TODO: set this to ~0.1; and get rid of all rescaling reinterpretations
+     defaults.d     = 0.1; %TODO: set this to ~0.1; and get rid of all rescaling reinterpretations
      defaults.a     = 1.05;
      defaults.b     = 0.2;
      defaults.tau   = 1.25;
