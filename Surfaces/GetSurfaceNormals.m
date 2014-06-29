@@ -64,6 +64,9 @@ VertexNormals = VertexNormals ./ repmat( NormVertexNormals, 3, 1 );
 
 
 % Check if normals are inwards - make them outwards
+% NOTE: Maybe some vertices are oriented clockwise, some are counter-clockwise. 
+%       To correct this consider using: meshcheckrepair(node,face) from iso2mesh
+%       to get consistent orientations.
 
 ZeroCenteredVertices = Vertices - repmat(mean(Vertices,1), 3, 1);
 
