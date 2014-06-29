@@ -1,62 +1,88 @@
+function [VertexNormals TriangleNormals] = GetSurfaceNormals(Vertices, Triangles) 
+
 %% Get triangle normals and estimate vertex normals
-%TODO: Add comments.
+% TODO: weight normals.
 % ARGUMENTS:
-%           <arg1> -- <description>
+%           Vertices  -- A NumberOfVertices  x 3 array with the positions of the vertices of a mesh. 
+%           Triangles -- A NumberOftriangles x 3 array with the vertex
+%                        indices making up the triangular faces of a mesh
 %
+%                
 % OUTPUT: 
-%           <output1> -- <description>
+%           VertexNormals   -- a NumberOfVertices x 3 array, with the unit
+%                              vectors of the normals at a given vertex.  
+%           TriangleNormals -- a NumberOfTriangles x 3 array, with the unit
+%                              vectors of the normals perpednicular to a triangle.  
 %
 % USAGE:
 %{
-      Angles = GetAngles(Vertices,Triangles);
-      tr = TriRep(Triangles, Vertices);
-      [VertexNormals TriangleNormals] = GetSurfaceNormals(tr,Angles);
+      [VertexNormals TriangleNormals] = GetSurfaceNormals(Vertices, Triangles);
 %}
 %
-% MODIFICATION HISTORY:
-%     SAK(30-09-2010) -- Original.
-%     SAK(Nov 2013)   -- Move to git, future modification history is
-%                        there...
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [VertexNormals TriangleNormals] = GetSurfaceNormals(tr,Angles)   
 
- NumberOfVertices = size(tr.X, 1);
- NumberOfTriangles = size(tr.Triangulation, 1);
 
-%keyboard 
-%%
- TriangleNormals = faceNormals(tr, (1:NumberOfTriangles).');
- SurrondingFaces = vertexAttachments(tr, (1:NumberOfVertices).'); 
  
- %TrianglesPerVertex = cellfun(@length, SurrondingFaces);
- %SurrondingFaceVertices = {tr.Triangulation(SurrondingFaces{:},:)};
- %SurrondingFaceVertices = cellfun(@(x,y) y(x,:), SurrondingFaces, tr.Triangulation, 'UniformOutput',false)
- %Circshift to put k in position 2 for each set of SurrondingFaceVertices
- %Normalise 1->2 and 2->3 to unit length 
- %Cross product normalised pairs of inout edges 1->2 X 2->3
- %Average and normalise to a unit normal for each vertex...
-%%%keyboard 
- VertexNormals = zeros(NumberOfVertices,3); 
- for k=1:NumberOfVertices, 
-   AngleMask = tr.Triangulation(SurrondingFaces{k},:) == k;
-   TheseAngles = Angles(SurrondingFaces{k}, :);
-   TheseAngles = TheseAngles(AngleMask);
-   AngleScaling = repmat(TheseAngles ./ sum(TheseAngles), [1 3]);
-   VertexNormals(k,:) = mean(AngleScaling .* TriangleNormals(SurrondingFaces{k},:)); %Scale by angle subtended. 
-   VertexNormals(k,:) = VertexNormals(k,:) ./ sqrt(sum(VertexNormals(k,:).^2));      %Normalise to unit vectors.
- end
+if size(Vertices, 1) > 3,
+     Vertices = Vertices';
+end
  
-%%% NOTE: FOR SOME REASON THIS DOESN'T SEEM TO GIVE THE SAME SENSE MANUAL 
-%%%       VERSION ABOVE... BUT NOT CONSISTENTLY, IE DON'T SIMPLY ALWAYS 
-%%%       POINT IN OPPOSITE DIRECTION. -VE RESULTS IN MORE CONSISTENCY.
-%%%       Also, has unwanted side effect of ploting the patches... 
-% % % %     SAK(16-02-2011) -- Changed to use patch properties rather than manual
-% % % %                        calc of VertexNormals, much faster. No longer
-% % % %                        require Angles arg...
-% % % SurfaceHandle = patch('Faces', tr.Triangulation, 'Vertices', tr.X);
-% % % VertexNormals2 = get(SurfaceHandle, 'VertexNormals');
-% % % VertexNormals2 = -VertexNormals2 ./ repmat(sqrt(sum(VertexNormals2.^2, 2)), [1 3]);
-%% 
+if size(Triangles, 1) > 3,
+     Triangles = Triangles';
+end
 
-end %function GetSurfaceNormals()
+NumberOfVertices  = size(Vertices, 2);
+NumberOfTriangles = size(Triangles, 2);
+ 
+VertexNormals   = zeros(3, NumberOfVertices);
+
+% Compute TRIANGLE normals
+TriangleNormals = crossp( Vertices(:, Triangles(2,:) )-Vertices(:,Triangles(1,:)), ...
+                  Vertices(:,Triangles(3,:))-Vertices(:,Triangles(1,:)) );
+
+% NORMALIZE 
+NormTriangleNormals = sqrt( sum(TriangleNormals.^2,1) ); 
+% Avoid division by zero
+NormTriangleNormals(NormTriangleNormals < eps) = 1;
+TriangleNormals = TriangleNormals ./ repmat( NormTriangleNormals, 3, 1 );
+
+
+
+% Compute unweighted VERTEX normals
+for i=1:NumberOfTriangles
+    ThisTriangle = Triangles(:,i);
+    for j=1:3
+        VertexNormals(:, ThisTriangle(j)) = VertexNormals(:, ThisTriangle(j)) + TriangleNormals(:, i);
+    end
+end
+
+% NORMALIZE
+NormVertexNormals = sqrt( sum(VertexNormals.^2,1) ); 
+% Avoid division by zero
+NormVertexNormals(NormVertexNormals < eps) = 1;
+VertexNormals = VertexNormals ./ repmat( NormVertexNormals, 3, 1 );
+
+
+% Check if normals are inwards - make them outwards
+
+ZeroCenteredVertices = Vertices - repmat(mean(Vertices,1), 3, 1);
+
+s = sum( ZeroCenteredVertices.* VertexNormals, 2);
+
+if sum(s > 0) < sum(s < 0)
+    % flip
+    VertexNormals   = - VertexNormals;
+    TriangleNormals = - TriangleNormals;
+end
+
+
+%% Auxiliary function - crossproduct
+
+function z = crossp(x, y)
+% x and y are (3, m) dimensional
+z = x;
+z(1,:) = x(2,:).*y(3,:) - x(3,:).*y(2,:);
+z(2,:) = x(3,:).*y(1,:) - x(1,:).*y(3,:);
+z(3,:) = x(1,:).*y(2,:) - x(2,:).*y(1,:);
+end 
+end%function GetSurfaceNormals()
