@@ -17,7 +17,7 @@
 % USAGE:
 %{
       load('Cortex_213.mat', 'Vertices', 'Triangles'); % Contains: 'Vertices', 'Triangles', 'VertexNormals', 'TriangleNormals' 
-      tr = TriRep(Triangles, Vertices); % Convert to TriRep object
+      tr = triangulation(Triangles, Vertices); % Convert to TriRep object
       [TriangleAreas, TotalSurfaceArea] = GetSurfaceAreas(tr);
 %}
 %
@@ -30,12 +30,12 @@
 function [TriangleAreas, TotalSurfaceArea] = GetSurfaceAreas(tr, TheseTriangles)
 %% Set any argument that weren't specified 
  if nargin < 2,
-    TheseTriangles= 1:size(tr.Triangulation, 1); %Calculate whole surface.
+    TheseTriangles= 1:size(tr.ConnectivityList, 1); %Calculate whole surface.
  end
  
  %% Do the  stuff...
-  TriangleU = tr.X(tr.Triangulation(TheseTriangles,2),:) - tr.X(tr.Triangulation(TheseTriangles,1),:);
-  TriangleV = tr.X(tr.Triangulation(TheseTriangles,3),:) - tr.X(tr.Triangulation(TheseTriangles,1),:);
+  TriangleU = tr.Points(tr.ConnectivityList(TheseTriangles,2),:) - tr.Points(tr.ConnectivityList(TheseTriangles,1),:);
+  TriangleV = tr.Points(tr.ConnectivityList(TheseTriangles,3),:) - tr.Points(tr.ConnectivityList(TheseTriangles,1),:);
   
   TriangleAreas = sqrt(sum(cross(TriangleU,TriangleV).^2, 2))./2;
      
