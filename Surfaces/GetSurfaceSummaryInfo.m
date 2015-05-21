@@ -52,7 +52,7 @@ function [SurfaceSummaryInfo] = GetSurfaceSummaryInfo(tr)
  for k = 1:NumberOfEdges,
    EdgeLengths(1,k) = dis(tr.X(SurfaceEdges(k,1),:).', tr.X(SurfaceEdges(k,2),:).');
  end
- 
+ SurfaceSummaryInfo.NumberOfEdges = NumberOfEdges;
  SurfaceSummaryInfo.minEdgeLength = min(EdgeLengths);
  SurfaceSummaryInfo.maxEdgeLength = max(EdgeLengths);
  SurfaceSummaryInfo.meanEdgeLength = mean(EdgeLengths);
