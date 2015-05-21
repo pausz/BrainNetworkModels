@@ -47,7 +47,7 @@ end
  for k = 1:Neighbourhood,
    TrIndices = vertexAttachments(TR, newVertices); 
    newTriangles = setdiff(unique([TrIndices{:}].')                   , LocalTriangles);   %
-   newVertices  = setdiff(unique(TR.ConnectivityList(newTriangles,:)), LocalVertices);    %find vertices that make up that set of triangles
+   newVertices  = setdiff(unique(TR.ConnectivityList(newTriangles,:).'), LocalVertices);    %find vertices that make up that set of triangles
    nRing(1,k) = length(newVertices);
    
    LocalTriangles = [LocalTriangles ; newTriangles];
