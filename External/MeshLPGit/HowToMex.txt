@@ -1,0 +1,3 @@
+% Make sure the gcc compiler is <=4.7 
+mex meshlpmatrix.cpp tmesh.cpp offobj.cpp matrix.cpp point.cpp cotlpmatrix.cpp comp_meshlpmatrix.cpp
+mex symmshlpmatrix.cpp meshlpmatrix.cpp tmesh.cpp comp_meshlpmatrix.cpp offobj.cpp matrix.cpp point.cpp
