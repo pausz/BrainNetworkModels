@@ -37,7 +37,7 @@ function options = SetInitialConditions(options)
     options.Dynamics.InitialConditions.StateRand = rand('state');
   else %Presumably Matlab
     options.Dynamics.InitialConditions.ThisRandomStream = RandStream.create('mt19937ar','seed', options.Dynamics.InitialConditions.StateRand);
-    RandStream.setDefaultStream(options.Dynamics.InitialConditions.ThisRandomStream);
+    RandStream.setGlobalStream(options.Dynamics.InitialConditions.ThisRandomStream);
     options.Dynamics.InitialConditions.StateRand  = options.Dynamics.InitialConditions.ThisRandomStream.State;
   end
   
