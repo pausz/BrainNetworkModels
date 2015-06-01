@@ -99,7 +99,7 @@ function [V W t options] = FHNtess_heun(options)
  if isoctave(),
    rand('state', options.Dynamics.InitialConditions.ThisRandomStream.State);
  else %Presumably Matlab
-   RandStream.setDefaultStream(options.Dynamics.InitialConditions.ThisRandomStream);
+   RandStream.setGlobalStream(options.Dynamics.InitialConditions.ThisRandomStream);
  end
 
 %Set initial state vectors
