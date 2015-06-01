@@ -68,17 +68,17 @@ function [Cortex Thalamus vertCortex trianCortex vertnormCortex] = PhysicsBrain(
     surf(Thalamus.X,Thalamus.Y,Thalamus.Z, 'FaceColor', [0.69 0.67 0.67], 'EdgeColor', [0.42 0.42 0.42]);
     alpha(.3);
     
-    plot3(Cortex.X(round(Discretization./2),:),Cortex.Y(round(Discretization./2),:),Cortex.Z(round(Discretization./2),:), 'r')
-    plot3(Thalamus.X(round(Discretization./2),:),Thalamus.Y(round(Discretization./2),:),Thalamus.Z(round(Discretization./2),:), 'g')
-    
+    plot3(Cortex.X(round(Discretization./2),:),Cortex.Y(round(Discretization./2),:),Cortex.Z(round(Discretization./2),:), 'r', 'linewidth', 2)
+    plot3(Thalamus.X(round(Discretization./2),:),Thalamus.Y(round(Discretization./2),:),Thalamus.Z(round(Discretization./2),:), 'g', 'linewidth', 2)
     AxisToOrigin(gcf,gca,{'Right Ear' 'Nose' 'Top'})
+
   
 %% 2D, approx... 
-%  figure,
-%   plot(Cortex.X(round(Discretization./2),:),Cortex.Y(round(Discretization./2),:), 'r')
-%   daspect([1 1 1])
-%   hold on
-%   plot(Thalamus.X(round(Discretization./2),:),Thalamus.Y(round(Discretization./2),:), 'g')
+ figure,
+  plot(Cortex.X(round(Discretization./2),:),Cortex.Y(round(Discretization./2),:),'r', 'linewidth', 2)
+  daspect([1 1 1])
+  hold on
+  plot(Thalamus.X(round(Discretization./2),:),Thalamus.Y(round(Discretization./2),:),'g', 'linewidth', 2)
 
 %% Extract (delaunay) triangulated cortical surface.
 
