@@ -56,7 +56,7 @@ switch FunctionType,
         %  f_xx + f_yy = 2
         AnalyticLaplacian = 2*ones(size(AnalyticFunction));
         
-    case 'Exponentialxy',
+    case 'Exponential',
         % f = e^(x+y)
         AnalyticFunction = Exponential(x, y);
         % f_xx + f_yy = 2e^(x+y)
