@@ -25,7 +25,7 @@
 %{
       ThisSurface = '213';
       load(['Cortex_' ThisSurface '.mat'], 'Vertices', 'Triangles');  % Contains: 'Vertices', 'Triangles' , 'VertexNormals', 'TriangleNormals'
-      tr = TriRep(Triangles, Vertices); % Convert to TriRep object
+      tr = triangulation(Triangles, Vertices); % Convert to TriRep object
       SurfaceSummaryInfo = GetSurfaceSummaryInfo(tr);
       
       %Save for later use
@@ -41,8 +41,8 @@
 function [SurfaceSummaryInfo] = GetSurfaceSummaryInfo(tr)
   
  %% NumberOf...
- SurfaceSummaryInfo.NumberOfVertices = size(tr.X,1);
- SurfaceSummaryInfo.NumberOfTriangles = size(tr.Triangulation,1);
+ SurfaceSummaryInfo.NumberOfVertices = size(tr.Points,1);
+ SurfaceSummaryInfo.NumberOfTriangles = size(tr.ConnectivityList,1);
  
  
  %% Lengths
@@ -50,9 +50,9 @@ function [SurfaceSummaryInfo] = GetSurfaceSummaryInfo(tr)
  NumberOfEdges = length(SurfaceEdges);
  EdgeLengths = zeros(1,NumberOfEdges);
  for k = 1:NumberOfEdges,
-   EdgeLengths(1,k) = dis(tr.X(SurfaceEdges(k,1),:).', tr.X(SurfaceEdges(k,2),:).');
+   EdgeLengths(1,k) = dis(tr.Points(SurfaceEdges(k,1),:).', tr.Points(SurfaceEdges(k,2),:).');
  end
- 
+ SurfaceSummaryInfo.NumberOfEdges = NumberOfEdges;
  SurfaceSummaryInfo.minEdgeLength = min(EdgeLengths);
  SurfaceSummaryInfo.maxEdgeLength = max(EdgeLengths);
  SurfaceSummaryInfo.meanEdgeLength = mean(EdgeLengths);

@@ -14,8 +14,7 @@
 %         
 % USAGE:
 %{
-      load('Cortex_213.mat', 'Vertices', 'Triangles', 'VertexNormals'); % Contains: 'Vertices', 'Triangles', 'VertexNormals', 'TriangleNormals' 
-      tr = TriRep(Triangles, Vertices); % Convert to TriRep object
+      TR = triangulation(Triangles, Vertices); 
       [LocalVertices LocalTriangles GlobalVertexIndices GlobalTriangleIndices nRing] = GetLocalSurface(tr, 42, 3);    
 %}
 %
@@ -30,11 +29,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [LocalVertices LocalTriangles GlobalVertexIndices GlobalTriangleIndices nRing] = GetLocalSurface(tr, FocalVertex, Neighbourhood)
+function [LocalVertices, LocalTriangles, GlobalVertexIndices, GlobalTriangleIndices, nRing] = GetLocalSurface(TR, FocalVertex, Neighbourhood)
 %% Set any argument that weren't specified
- if nargin<3,
+if nargin<2,
    Neighbourhood = 1;
- end
+   FocalVertex = 42;
+elseif nargin <3,
+   Neighbourhood = 1;
+end
 
 %% Do the stuff...
  % Get indices of local vertices and triangles 
@@ -43,9 +45,9 @@ function [LocalVertices LocalTriangles GlobalVertexIndices GlobalTriangleIndices
  newVertices = FocalVertex;
  nRing = zeros(1,Neighbourhood);
  for k = 1:Neighbourhood,
-   TrIndices = vertexAttachments(tr, newVertices); 
-   newTriangles = setdiff(unique([TrIndices{:}].'),                 LocalTriangles);   %
-   newVertices  = setdiff(unique(tr.Triangulation(newTriangles,:)), LocalVertices);    %find vertices that make up that set of triangles
+   TrIndices = vertexAttachments(TR, newVertices); 
+   newTriangles = setdiff(unique([TrIndices{:}].')                   , LocalTriangles);   %
+   newVertices  = setdiff(unique(TR.ConnectivityList(newTriangles,:).'), LocalVertices);    %find vertices that make up that set of triangles
    nRing(1,k) = length(newVertices);
    
    LocalTriangles = [LocalTriangles ; newTriangles];
@@ -59,14 +61,14 @@ function [LocalVertices LocalTriangles GlobalVertexIndices GlobalTriangleIndices
     GlobalTriangleIndices = LocalTriangles;
   end
  
- LocalTriangles = tr.Triangulation(LocalTriangles,:);
+ LocalTriangles = TR.ConnectivityList(LocalTriangles,:);
  % Map triangles from "vertices" indices to "LocalVertices" indices 
  temp = zeros(size(LocalTriangles));
  for j = 1:length(LocalVertices) 
    temp(LocalTriangles==LocalVertices(j)) = j;
  end
  LocalTriangles = temp;
- LocalVertices = tr.X(LocalVertices,:);
+ LocalVertices = TR.Points(LocalVertices,:);
   
 %% 
 
