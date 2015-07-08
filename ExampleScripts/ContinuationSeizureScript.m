@@ -136,7 +136,10 @@ PlotTimeSeries(Store_phi_e)
 %% Save results
 % Save everything
 save('ContinuationSeizureScript')
+% Save options
+save('ContinuationSeizureScriptOptions', 'options')
 % Save initial conditions for python
 InitialConditions = options.Dynamics.InitialConditions;
 save('AbsenceInitialConditions', 'InitialConditions')
+
 %%%EoF%%%
