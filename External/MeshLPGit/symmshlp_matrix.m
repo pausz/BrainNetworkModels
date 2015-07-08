@@ -19,7 +19,7 @@ function [W, A, h] = symmshlp_matrix(filename, opt)
 %
 % OUTPUTS
 %  W: symmetric weight matrix 
-%  A: area weight per vertex, the Laplace matrix = diag(1./ A) * W 
+%  A: area weight per vertex, the Laplace matrix = sparse(diag(1./ A)) * W 
 %  h: Gaussian width: h^2 = 4t 
 
 
@@ -38,14 +38,14 @@ if opt.hs <= 0 || opt.rho <= 0
 end
 
 
-[II JJ SS AA h] = symmshlpmatrix(filename, opt);
+[II, JJ, SS, AA, h] = symmshlpmatrix(filename, opt);
 W=sparse(II, JJ, SS);
 A=AA;
 
 % Parsing Option.
 function option = parse_opt(opt)
 option = opt;
-option_names = {'hs', 'rho', 'htype', 'dtype'};
+%option_names = {'hs', 'rho', 'htype', 'dtype'};
 if ~isfield(option,'hs'),
 	option = setfield(option,'hs',2);
 end

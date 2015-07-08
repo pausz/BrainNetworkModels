@@ -1,7 +1,7 @@
 %% Calculate area of triangles making up a surface
 %
 % ARGUMENTS:
-%           tr -- matlab TriRep object, representing the surface. 
+%           tr -- matlab triangulation object, representing the surface. 
 %           TheseTriangles -- Default is whole surface, use this to specify 
 %                             only a subset of triangles.
 %

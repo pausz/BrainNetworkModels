@@ -71,6 +71,7 @@ switch FunctionType,
         % Even in that case my derivation gives 2*(cos(phi).^(2) - *sin(phi).^2)
         %AnalyticLaplacian = 4*cos(phi).^(2) - 2*sin(phi).^2;
         % This is using the right parametrization and def of Laplacian.
+        %AnalyticLaplacian = 4*cos(phi).^(2) - 2*sin(phi).^2;
         AnalyticLaplacian = 3*(cos(phi).^2 - sin(phi).^2) + 1;
 
 end %function AnalyticFunction()

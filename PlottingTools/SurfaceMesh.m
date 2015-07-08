@@ -26,7 +26,7 @@
 %                        there...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [ThisFigure SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
+function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
 
 %% Display info
  ThisScreenSize = get(0,'ScreenSize');
@@ -34,7 +34,7 @@ function [ThisFigure SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
    
  
 %% Initialise figure  
- ThisFigure = figure;
+ ThisFigure = gcf;
  set(ThisFigure,'Position',FigureWindowSize);
  
  colormap(gray)
@@ -62,9 +62,12 @@ function [ThisFigure SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
  zlabel('Z (mm)');
  
  set(gca, 'CameraViewAngle', 7);
- set(gca, 'CameraUpVector', [-0.25 0.44 0.86]);
- set(gca, 'CameraPosition', [664 -1238 768]);
- 
+ %set(gca, 'CameraUpVector', [-0.25 0.44 0.86]);
+ %set(gca, 'CameraPosition', [664 -1238 768]);
+ grid on;
+ light;
+ lighting phong;
+ camlight('left');
  daspect([1 1 1])
  
 %keyboard                       

@@ -120,6 +120,7 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, Mapping, Tim
     
     daspect([1 1 1])
     colorbar('location','southoutside');
+    colormap(brewermap([], '*RdBu'))
     caxis(SurfacePaneHandle, 'manual');
     caxis(SurfacePaneHandle, [1 ColourSteps]);
 %keyboard                       

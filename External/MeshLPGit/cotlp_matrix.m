@@ -1,4 +1,4 @@
-function [W A] = cotlp_matrix(filename)
+function [W, A] = cotlp_matrix(filename)
 %
 % Compute the Laplace-Beltrami matrix from mesh by cot scheme
 %
