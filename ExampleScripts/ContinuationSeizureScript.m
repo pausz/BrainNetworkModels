@@ -1,5 +1,5 @@
 %% Transition in and out of an absence seizure for the spatially uniform case as presented in 
-% [1] Breakspear et al., (2005 
+% [1] Breakspear et al., (2005) 
 % A Unifying Explanation of Primary Generalized Seizures Through Nonlinear Brain Modelling and Bifurcation Analysis.
 % Crebral Cortex
 
@@ -133,4 +133,10 @@ toc;
 
 PlotTimeSeries(Store_phi_e)
 
+%% Save results
+% Save everything
+save('ContinuationSeizureScript')
+% Save initial conditions for python
+InitialConditions = options.Dynamics.InitialConditions;
+save('AbsenceInitialConditions', 'InitialConditions')
 %%%EoF%%%
