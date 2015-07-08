@@ -3,7 +3,7 @@
 % A Unifying Explanation of Primary Generalized Seizures Through Nonlinear Brain Modelling and Bifurcation Analysis.
 % Crebral Cortex
 
-% Approximate runtime: 80 [s] workstation March 2015
+% Approximate runtime: ~ 80 [s] workstation March 2015
 % Approximate memory:  500 MB
 % Approximate storage: XX
 
@@ -88,7 +88,7 @@ Store_phi_e = [];
  options.Dynamics.nu_se(:) =  Supercritical_nu_se;
  Continuations = 4;
  for k = 1:Continuations,
-   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for middle seizure...'])
+   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for supercritical instability ...'])
    [phi_e, dphi_e, V_e, dV_e, V_s, dV_s, V_r, dV_r, t, options] = BRRW_heun(options);
    Store_phi_e = [Store_phi_e ; phi_e(1:DSF_t:end, :)];
    options = UpdateInitialConditions(options);
@@ -99,7 +99,7 @@ Store_phi_e = [];
  options.Dynamics.nu_se(:) =  FirstPeriodDoubling_nu_se; 
  Continuations = 4;
  for k = 1:Continuations,
-   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for full seizure...'])
+   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for seizure onset, first period doubling ...'])
    [phi_e, dphi_e, V_e, dV_e, V_s, dV_s, V_r, dV_r, t, options] = BRRW_heun(options);
    Store_phi_e = [Store_phi_e ; phi_e(1:DSF_t:end, :)];
    options = UpdateInitialConditions(options);
@@ -110,7 +110,7 @@ Store_phi_e = [];
  options.Dynamics.nu_se(:) =  SecondPeriodDoubling_nu_se; 
  Continuations = 4;
  for k = 1:Continuations,
-   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for full seizure...'])
+   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for second period doubling...'])
    [phi_e, dphi_e, V_e, dV_e, V_s, dV_s, V_r, dV_r, t, options] = BRRW_heun(options);
    Store_phi_e = [Store_phi_e ; phi_e(1:DSF_t:end, :)];
    options = UpdateInitialConditions(options);
@@ -121,7 +121,7 @@ Store_phi_e = [];
  options.Dynamics.nu_se =LinearlyStable_nu_se;
  Continuations = 2;
  for k = 1:Continuations,
-   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for post seizure...'])
+   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for seizure offset...'])
    [phi_e, dphi_e, V_e, dV_e, V_s, dV_s, V_r, dV_r, t, options] = BRRW_heun(options);
    Store_phi_e = [Store_phi_e ; phi_e(1:DSF_t:end, :)];
    options = UpdateInitialConditions(options);
