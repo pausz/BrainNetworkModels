@@ -4,8 +4,8 @@
 % ARGUMENTS:
 %           TimeSeries -- As output from a simulation, ie with 
 %                         shape = [tpts, nodes, modes]
-%           time -- Either dt or a vector of time values, with length = tpts.
-%           labels -- node labels, eg options.Connectivity.NodeStr 
+%           time       -- Either dt or a vector of time values, with length = tpts.
+%           labels     -- node labels, eg options.Connectivity.NodeStr 
 %
 % OUTPUT: 
 %           figure_handles -- cell array of figure handles.
@@ -26,7 +26,7 @@
 function figure_handles = PlotTimeSeries(TimeSeries, time, labels)
 
   ThisStateVariable = inputname(1);
-  [TimeSteps NumberOfNodes NumberOfModes] = size(TimeSeries);
+  [TimeSteps, NumberOfNodes, NumberOfModes] = size(TimeSeries);
   
   if nargin < 2,
     time = 1:TimeSteps;
@@ -52,7 +52,7 @@ function figure_handles = PlotTimeSeries(TimeSeries, time, labels)
     plot(time, TimeSeries(:,:,nom) + SeparateBy(1,nom)*NodesByTimeStepSize);
     ThisTitle = [ThisStateVariable '    Mode ' num2str(nom) ' of ' num2str(NumberOfModes)];
     title(ThisTitle, 'interpreter', 'none');
-    xlabel('Time(ms)');
+    xlabel('Time [ms]');
     set(gca,'ylim',[0 SeparateBy(1,nom)*(NumberOfNodes+1)]);
     set(gca,'YTick', SeparateBy(1,nom)*(1:NumberOfNodes));
     set(gca,'YTickLabel', labels);
