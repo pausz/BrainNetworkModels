@@ -5,7 +5,7 @@
 
 % Approximate runtime: ~ 80 [s] workstation March 2015
 % Approximate memory:  500 MB
-% Approximate storage: XX
+% Approximate storage: 5.4 MB
 
 %% Description of the simulation
 % This simulation intends to reproduce key results shown in Figure 3 of
@@ -69,6 +69,7 @@ Store_phi_e = [];
  for k = 1:Continuations,
    disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for initial integration...'])
    [phi_e, dphi_e, V_e, dV_e, V_s, dV_s, V_r, dV_r, t, options] = BRRW_heun(options);
+   Store_phi_e = [Store_phi_e ; phi_e(1:DSF_t:end,:)];
    options = UpdateInitialConditions(options);
    
  end
@@ -135,11 +136,11 @@ PlotTimeSeries(Store_phi_e)
 
 %% Save results
 % Save everything
-save('ContinuationSeizureScript')
-% Save options
-save('ContinuationSeizureScriptOptions', 'options')
-% Save initial conditions for python
-InitialConditions = options.Dynamics.InitialConditions;
-save('AbsenceInitialConditions', 'InitialConditions')
+% save('ContinuationSeizureScript')
+% % Save options
+% save('ContinuationSeizureScriptOptions', 'options')
+% % Save initial conditions for python
+% InitialConditions = options.Dynamics.InitialConditions;
+% save('AbsenceInitialConditions', 'InitialConditions')
 
 %%%EoF%%%
