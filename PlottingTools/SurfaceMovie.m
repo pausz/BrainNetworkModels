@@ -2,9 +2,9 @@
 %  time series projection. 
 %
 % ARGUMENTS:
-%        Surface -- TriRep object of cortical surface.
+%        Surface    -- TriRep object of cortical surface.
 %        TimeSeries -- The timeseries (time-points, NumberOfVertices)
-%        Mapping -- From vertices to timeseries you want to display,
+%        Mapping    -- From vertices to timeseries you want to display,
 %                   a simple subset, a region averaging, or 
 %TODO: more complex mappings such as EEG/MEG/etc... 
 %
@@ -13,11 +13,10 @@
 %        TheMovie    -- Matlab movie of the animation.
 %
 % REQUIRES: 
-%        TriRep -- A Matlab object, not yet available in Octave.
-%
+%        triangulation -- A Matlab 'triangulation' object, not yet available in Octave.
 % USAGE:
 %{     
-       TR = TriRep(Triangles, Vertices);
+       TR = triangulation(Triangles, Vertices);
        Step = 2^3;
        Duration = 2^14;
        SimulatedActivity = Store_phi_e(end-Duration+1:Step:end,:);
@@ -31,6 +30,7 @@
 %     SAK(19-11-2010) -- Original.
 %     SAK(Nov 2013)   -- Move to git, future modification history is
 %                        there...
+%     PSL(July 2015)  -- TAG: MatlabR2015a
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %TODO: Make Mapping a structure containg a projection matrix & cell array 
@@ -40,15 +40,18 @@
 
 %TODO: Consider adding pause and reverse play feature... 
 
-function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, Mapping, Time)
+function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Time)
 %% Set defaults for any argument that weren't specified
   if nargin<3,
     Mapping = 1:42;  
+  else
+    Mapping = options.Connectivity.RegionMapping;
+    NodeStr = options.Connectivity.NodeStr;
   end
   
   % Data info
-  NumberOfVertices = length(Surface.X);
-  TimeSteps = size(TimeSeries, 1);
+  NumberOfVertices = length(Surface.Points);
+  TimeSteps        = size(TimeSeries, 1);
   
   if nargin<4,
     Time = 1:TimeSteps;
@@ -83,7 +86,7 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, Mapping, Tim
     TimeSeriesTitle = 'EEG TimeSeries';
   
   else
-    msg = 'The Mappin arg should either provide indices to average over or a projectin matrix...';
+    msg = 'The Mapping arg should either provide indices to average over or a projectin matrix...';
     error(['BrainNetworkModels:' mfilename ':StrangeShapedMapping'], msg);
   end
   
@@ -94,12 +97,12 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, Mapping, Tim
   plot(TimeSeriesPaneHandle, Time, RegionalTimeseries + SeparateBy*repmat((1:NumberOfRegions),[TimeSteps,1]), 'LineWidth', 3);
   title(TimeSeriesTitle, 'interpreter', 'none');
   set(gca,'xlim',[0 Time(end)]);
-  xlabel('Time(dpts)');
+  xlabel('Time (dpts)');
   set(gca,'ylim',[0 SeparateBy*(NumberOfRegions+1)]);
   set(gca,'YTick', SeparateBy*(1:NumberOfRegions));
   YaxesLimits = get(gca,'ylim');
   hold(TimeSeriesPaneHandle, 'on')
-  %set(gca,'YTickLabel', options.Connectivity.NodeStr);
+  set(gca,'YTickLabel', NodeStr);
   
   CurrentTimeHandle = plot(TimeSeriesPaneHandle, [1 1],YaxesLimits, 'color',[0.73 0.73 0.73]);
 
@@ -110,17 +113,18 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, Mapping, Tim
   TimeSeries = max(fix(((TimeSeries-MinData) ./ (MaxData-MinData)) .* ColourSteps), 1); 
   
   subplot(SurfacePaneHandle),
-    SurfaceHandle = patch('Faces', Surface.Triangulation(1:1:end,:) , 'Vertices', Surface.X, ...
-                          'Edgecolor','interp', 'FaceColor', 'interp', 'FaceVertexCData', TimeSeries(1,:).', 'CDataMapping', 'direct'); %
+    SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
+                          'Edgecolor',[0.77, 0.77, 0.77], 'FaceColor', 'interp', 'FaceVertexCData', TimeSeries(1,:).', 'CDataMapping', 'direct'); %
     material dull
-    %title(['???'], 'interpreter', 'none');
+    title('phi_e', 'interpreter', 'none');
     xlabel('X (mm)');
     ylabel('Y (mm)');
     zlabel('Z (mm)');
+    view([-89 0]);
     
     daspect([1 1 1])
     colorbar('location','southoutside');
-    colormap(brewermap([], '*RdBu'))
+    colormap(brewermap([], 'Reds'))
     caxis(SurfacePaneHandle, 'manual');
     caxis(SurfacePaneHandle, [1 ColourSteps]);
 %keyboard                       
