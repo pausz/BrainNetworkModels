@@ -8,13 +8,13 @@
 %      SurfaceHandle    -- Handle to patch object, cortical surface.
 %
 % REQUIRES: 
-%        TriRep -- A Matlab object, not yet available in Octave.
+%        triangulation -- A Matlab object, not yet available in Octave.
 %
 % USAGE:
 %{     
        ThisSurface = '213';
        load(['Cortex_' ThisSurface '.mat'], 'Vertices', 'Triangles', 'VertexNormals'); 
-       tr = TriRep(Triangles, Vertices);
+       tr = triangulation(Triangles, Vertices);
        SurfaceCurvature = GetSurfaceCurvature(tr, VertexNormals);
 
        SurfaceMesh(tr, SurfaceCurvature)
@@ -41,16 +41,16 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
   
 %% Colour Surface by Region
  if nargin<2,
-   SurfaceHandle = patch('Faces', Surface.Triangulation(1:1:end,:) , 'Vertices', Surface.X, ...
+   SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
      'Edgecolor', [0 0 0], 'FaceColor', [0.8 0.8 0.8]);
  else
    switch length(SurfaceShading),
-     case size(Surface.X,1)
-       SurfaceHandle = patch('Faces', Surface.Triangulation(1:1:end,:) , 'Vertices', Surface.X, ...
+     case size(Surface.Points,1)
+       SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
                              'Edgecolor', [0 0 0], 'FaceColor', 'interp', 'FaceVertexCData', SurfaceShading.'); %
    
-     case size(Surface.Triangulation,1)
-       SurfaceHandle = patch('Faces', Surface.Triangulation(1:1:end,:) , 'Vertices', Surface.X, ...
+     case size(Surface.ConnectivityList,1)
+       SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
                              'Edgecolor', [0 0 0], 'FaceColor', 'flat',  'FaceVertexCData', SurfaceShading.'); %
    end
    title(['Shading represents:' inputname(2)], 'interpreter', 'none');
