@@ -28,7 +28,7 @@
        Right = load('Polish_213_rh.pial.mat');
        Vertices  = [Left.Vertices  ; Right.Vertices];
        Triangles = [Left.Triangles ; Right.Triangles+length(Left.Vertices)]; 
-       tr = TriRep(Triangles, Vertices);
+       tr = trinagulation(Triangles, Vertices);
 
       %For epilepsy work...   
        TheseParameters = {'nu_se'};
@@ -55,7 +55,7 @@ function options = SmoothMeshParameters(TR, options, TheseParameters, Neighbourh
 %TODO: make possible to specify in mm
  
 %% Sizes and preallocation
- NumberofVertices = length(TR.X);
+ NumberofVertices = length(TR.Points);
  
  
 %% Do The Stuff
