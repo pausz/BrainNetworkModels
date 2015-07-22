@@ -10,11 +10,11 @@
 %        SurfaceHandle    -- Handle to patch object, cortical surface.
 %
 % REQUIRES: 
-%        TriRep -- A Matlab object, not yet available in Octave.
+%        triangulation -- A Matlab object, not yet available in Octave.
 %
 % USAGE:
 %{     
-       TR = TriRep(Triangles, Vertices);
+       TR = triangulation(Triangles, Vertices);
        SurfaceConnectivity(TR, options)
 %}
 %
@@ -22,10 +22,11 @@
 %     SAK(24-11-2010) -- Original.
 %     SAK(Nov 2013)   -- Move to git, future modification history is
 %                        there...
+%     PSL(Jul 2015)   -- TAG: MatlabR2015a
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [ThisFigure SurfaceHandle] = SurfaceConnectivity(Surface, options)
+function [ThisFigure, SurfaceHandle] = SurfaceConnectivity(Surface, options)
 %% Data info
   NumberOfRegions = length(unique(options.Connectivity.RegionMapping));
   MaxW = max(options.Connectivity.weights(options.Connectivity.weights~=0));
@@ -37,6 +38,7 @@ function [ThisFigure SurfaceHandle] = SurfaceConnectivity(Surface, options)
   
   ThisRegionColour      = [1 0 0];
   ConnectedRegionColour = [0 1 0];
+  EdgeColour = [0 0 0];
   %OtherRegionColour     = [0 0 1];
 
 %% Initialise figure  
@@ -44,10 +46,10 @@ function [ThisFigure SurfaceHandle] = SurfaceConnectivity(Surface, options)
   set(ThisFigure,'Position',FigureWindowSize);
 
 %% Initialise Surface
-  Connectivity = zeros(size(Surface.X)); 
+  Connectivity = zeros(size(Surface.Points)); 
   
-  SurfaceHandle = patch('Faces', Surface.Triangulation(1:1:end,:) , 'Vertices', Surface.X, ...
-    'Edgecolor','interp', 'FaceColor', 'interp', 'FaceVertexCData', Connectivity); %
+  SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
+    'Edgecolor',EdgeColour, 'FaceColor', 'interp', 'FaceVertexCData', Connectivity); %
   material dull
   SurfaceAxes = ancestor(SurfaceHandle,{'axes'});
   %title(['???'], 'interpreter', 'none');
@@ -63,7 +65,7 @@ function [ThisFigure SurfaceHandle] = SurfaceConnectivity(Surface, options)
   Region = 1;
   while (Region >= 1) && (Region <= NumberOfRegions),
     %Get this regions connectivity
-    Connectivity = zeros(size(Surface.X));
+    Connectivity = nan(size(Surface.Points));
     Connectivity(options.Connectivity.RegionMapping == Region,:) = repmat(ThisRegionColour, [sum(options.Connectivity.RegionMapping == Region) 1]);
     ConnectedRegions = find(options.Connectivity.weights(Region,:));
     ConnectedRegions = setdiff(ConnectedRegions,Region);
