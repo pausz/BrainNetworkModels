@@ -19,7 +19,7 @@
 %{     
        ThisSurface = 'reg13';
        load(['Surfaces' filesep 'Cortex_' ThisSurface '.mat'], 'Vertices', 'Triangles');  % Contains: 'Vertices', 'Triangles', 'VertexNormals', 'TriangleNormals'
-       tr = TriRep(Triangles, Vertices);
+       tr = triangulation(Triangles, Vertices);
 
        options.Connectivity.WhichMatrix = 'O52R00_IRP2008';
        options.Connectivity.hemisphere = 'both';
@@ -41,7 +41,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [ThisFigure, SurfaceHandle] = SurfaceRegions(Surface, options, ThisColourMap, ThisRegionIndex)
+function [ThisFigure, SurfaceHandleOne] = SurfaceRegions(Surface, options, ThisColourMap, ThisRegionIndex)
 %% Set any argument that weren't specified
   if nargin < 3,
     ThisColourMap  = 'RegionColours74';
@@ -56,6 +56,8 @@ function [ThisFigure, SurfaceHandle] = SurfaceRegions(Surface, options, ThisColo
   NumberOfRegions = length(unique(options.Connectivity.RegionMapping));
   ThisRegionColour = [0.75 0.75 0.75];
   ThisVertexColour = [1 0 0];
+  NumberOfVertices = size(Surface.Points, 1);
+  NumberOfTriangles = size(Surface.ConnectivityList, 1);
 
 %% Display info
   ThisScreenSize = get(0,'ScreenSize');
@@ -92,8 +94,9 @@ else
   legend(options.Connectivity.NodeStr(ThisRegionIndex))
   hold;
 end    
-  SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
+  SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:NumberOfTriangles,:) , 'Vertices', Surface.Points, ...
     'Edgecolor',EdgeColour, 'FaceColor', 'interp', 'FaceVertexCData', FaceVertexData); %
+
   set(SurfaceHandle, 'FaceAlpha', 0.5)
 
   material dull
