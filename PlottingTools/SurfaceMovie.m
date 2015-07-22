@@ -94,10 +94,14 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Tim
   
   SeparateBy = 0.33*(max(RegionalTimeseries(:)) - min(RegionalTimeseries(:)));
   
-  plot(TimeSeriesPaneHandle, Time, RegionalTimeseries + SeparateBy*repmat((1:NumberOfRegions),[TimeSteps,1]), 'LineWidth', 3);
+  plot(TimeSeriesPaneHandle, Time, RegionalTimeseries + SeparateBy*repmat((1:NumberOfRegions),[TimeSteps,1]), 'linewidth', 2);
+  % Hacky bit: remove and/or add functionality to highlight.
+  hold;
+  plot(TimeSeriesPaneHandle, Time, RegionalTimeseries(:, 61) + SeparateBy*repmat(61,[TimeSteps,1]), 'r','linewidth', 3);
+
   title(TimeSeriesTitle, 'interpreter', 'none');
-  set(gca,'xlim',[0 Time(end)]);
-  xlabel('Time (dpts)');
+  set(gca,'xlim',[Time(1) Time(end)]);
+  xlabel('Time (ms)');
   set(gca,'ylim',[0 SeparateBy*(NumberOfRegions+1)]);
   set(gca,'YTick', SeparateBy*(1:NumberOfRegions));
   YaxesLimits = get(gca,'ylim');
@@ -108,23 +112,29 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Tim
 
 %% Initialise Surface
   %Map timeseries to colormap indices
-  MAP = colormap;
+  MAP = colormap(parula(250));
   ColourSteps = size(MAP,1);
   TimeSeries = max(fix(((TimeSeries-MinData) ./ (MaxData-MinData)) .* ColourSteps), 1); 
+  EdgeColour = 'interp';
   
   subplot(SurfacePaneHandle),
     SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
-                          'Edgecolor',[0.77, 0.77, 0.77], 'FaceColor', 'interp', 'FaceVertexCData', TimeSeries(1,:).', 'CDataMapping', 'direct'); %
+                          'Edgecolor',EdgeColour, 'FaceColor', 'interp', 'FaceVertexCData', TimeSeries(1,:).', 'CDataMapping', 'direct'); %
     material dull
-    title('phi_e', 'interpreter', 'none');
+    title('$$ \phi_{e}\,$$', 'interpreter', 'latex', 'fontsize', 42);
+    % Today is ..
+    str = datestr(clock);
+    annotation('textbox', [0.05 0.755 0.1 0.02],'String', str)
     xlabel('X (mm)');
     ylabel('Y (mm)');
     zlabel('Z (mm)');
-    view([-89 0]);
+    view([0 0]);
     
     daspect([1 1 1])
     colorbar('location','southoutside');
     colormap(brewermap([], 'Reds'))
+    
+  
     caxis(SurfacePaneHandle, 'manual');
     caxis(SurfacePaneHandle, [1 ColourSteps]);
 %keyboard                       
@@ -138,8 +148,7 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Tim
   for k = 1:TimeSteps,
     delete(CurrentTimeHandle)
     CurrentTimeHandle = plot(TimeSeriesPaneHandle, [Time(k) Time(k)],YaxesLimits, 'color',[0.42 0.42 0.42], 'LineWidth', 3);
-    set(SurfaceHandle, 'FaceVertexCData', TimeSeries(k,:).', 'CDataMapping', 'direct')
-    
+    set(SurfaceHandle, 'FaceVertexCData', TimeSeries(k,:).', 'CDataMapping', 'direct')    
     %Save movie
     if nargout>1,
       TheMovie(1,k) = getframe(ThisFigure);
