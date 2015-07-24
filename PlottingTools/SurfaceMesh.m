@@ -24,6 +24,7 @@
 %     SAK(13-01-2011) -- Original.
 %     SAK(Nov 2013)   -- Move to git, future modification history is
 %                        there...
+%     PSL(Jul 2015)   -- TAG: MatlabR2015a
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
@@ -37,7 +38,7 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
  ThisFigure = gcf;
  set(ThisFigure,'Position',FigureWindowSize);
  
- colormap(gray)
+ colormap(brewermap([], 'Reds'))
   
 %% Colour Surface by Region
  if nargin<2,
@@ -64,6 +65,7 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
  set(gca, 'CameraViewAngle', 7);
  %set(gca, 'CameraUpVector', [-0.25 0.44 0.86]);
  %set(gca, 'CameraPosition', [664 -1238 768]);
+ view(3)
  grid on;
  light;
  lighting phong;
