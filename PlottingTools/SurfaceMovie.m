@@ -66,6 +66,7 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Tim
 
 %% Initialise figure  
   ThisFigure = figure;
+  orient landscape
   set(ThisFigure,'Position',FigureWindowSize);
   SurfacePaneHandle = subplot('position',[0.05 0.15 0.3 0.7]);
   TimeSeriesPaneHandle = subplot('position',[0.4 0.05 0.55 0.9]);
@@ -131,7 +132,10 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Tim
     view([0 0]);
     
     daspect([1 1 1])
-    colorbar('location','southoutside');
+    ColorBarHandle = colorbar;
+    set(ColorBarHandle, 'location', 'southoutside')
+    set(ColorBarHandle,'ytick',linspace(1,ColourSteps,2))
+    set(ColorBarHandle, 'yticklabel', linspace(MinData, MaxData,2))
     colormap(brewermap([], 'Reds'))
     
   

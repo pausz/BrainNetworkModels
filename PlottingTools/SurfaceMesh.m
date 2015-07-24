@@ -37,7 +37,6 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
  ThisFigure = gcf;
  set(ThisFigure,'Position',FigureWindowSize);
  
- colormap(gray)
   
 %% Colour Surface by Region
  if nargin<2,
@@ -57,13 +56,14 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
  end
  material dull
  
+ colormap(brewermap([], 'Reds'))
+ 
  xlabel('X (mm)');
  ylabel('Y (mm)');
  zlabel('Z (mm)');
  
+ view([-90, 0])
  set(gca, 'CameraViewAngle', 7);
- %set(gca, 'CameraUpVector', [-0.25 0.44 0.86]);
- %set(gca, 'CameraPosition', [664 -1238 768]);
  grid on;
  light;
  lighting phong;
