@@ -1,10 +1,10 @@
 %% Plot the cortical surface emphasising mesh. 
 %
 % ARGUMENTS:
-%          Surface -- TriRep object of cortical surface.
+%          Surface -- triangulation object of cortical surface.
 %
 % OUTPUT: 
-%      ThisFigure        -- Handle to overall figure object.
+%      ThisFigure       -- Handle to overall figure object.
 %      SurfaceHandle    -- Handle to patch object, cortical surface.
 %
 % REQUIRES: 
@@ -38,7 +38,6 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
  ThisFigure = gcf;
  set(ThisFigure,'Position',FigureWindowSize);
  
- colormap(brewermap([], 'Reds'))
   
 %% Colour Surface by Region
  if nargin<2,
@@ -56,7 +55,10 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
    end
    title(['Shading represents:' inputname(2)], 'interpreter', 'none');
  end
+
+ % Axes and Mesh plotting properties
  material dull
+ colormap(brewermap([], 'Reds'))
  
  xlabel('X (mm)');
  ylabel('Y (mm)');
