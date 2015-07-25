@@ -3,12 +3,11 @@
 % Calculation is done using NodeBifurcation() and subsequent
 % visualisation uses PlotNodeBifurcation().
 %
-% Approximate runtime: 5 hours, Octave, Workstation circa 2012
-% Approximate memory:  < 1GB
+% Approximate runtime: 2h15m , Octave, Workstation circa 2012
+% Approximate memory:  < 500MB
 % Approximate storage: <?>MB 
-%
-%
-
+% From command line:
+% matlab -nodesktop -nosplash -r AbsenceBifurcationScriptTwoNodes
 
 %% Some details of our environment...
   %Where is the code
@@ -30,8 +29,9 @@
 %% Do the stuff...
   
   %Specify Connectivity to use
-  options.Connectivity.WhichMatrix = 'O52R00_IRP2008';
-  options.Connectivity.RemoveThalamus = true;
+  options.Connectivity.WhichMatrix = 'Random';
+  options.Connectivity.NumberOfNodes = 2;
+  %options.Connectivity.RemoveThalamus = true;
   options.Connectivity.invel = 1.0/7.0;
   
   %Specify Dynamics to use
@@ -60,21 +60,24 @@
   options.Other.verbosity = 4; %42;
   
   %Calcualte the bifurcation
-  [ForwardFxdPts BackwardFxdPts options] = NodeBifurcation(options);
+  [ForwardFxdPts, BackwardFxdPts, options] = NodeBifurcation(options);
 
 
 %% When did we finish:
   disp(['Script ended: ' when()])
-
+%% Save the results
+  save(ThisScript, 'ForwardFxdPts', 'BackwardFxdPts', 'options')
+%% 
+exit
 %% Plotting
-  %Select a few nodes
-  options.Plotting.OnlyNodes = {'rFEF', 'rPFCORB', 'rV1', 'rV2'};
+  Select a few nodes
+  options.Plotting.OnlyNodes = {'1'};
   
   % plot them
-  FigureHandles = PlotNodeBifurcation(ForwardFxdPts, options)
+  FigureHandles = PlotNodeBifurcation(ForwardFxdPts, options);
   
   %Optionally over plot the Extrema found by back tracking
   options.Plotting.FigureHandles = FigureHandles;
-  FigureHandles = PlotNodeBifurcation(BackwardFxdPts, options)
+  FigureHandles = PlotNodeBifurcation(BackwardFxdPts, options);
 
 %%%EoF%%%
