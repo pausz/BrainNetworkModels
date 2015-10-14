@@ -6,7 +6,7 @@
 %                             only a subset of triangles.
 %
 % OUTPUT: 
-%           TriangleAreas -- Area of triangles that make up th e surface,
+%           TriangleAreas -- Area of triangles that make up the surface,
 %                            by default the whole surface.
 %           TotalSurfaceArea -- Sum of area of triangles, by default the
 %                               whole surface. 
@@ -16,8 +16,8 @@
 %
 % USAGE:
 %{
-      load('Cortex_213.mat', 'Vertices', 'Triangles'); % Contains: 'Vertices', 'Triangles', 'VertexNormals', 'TriangleNormals' 
-      tr = triangulation(Triangles, Vertices); % Convert to TriRep object
+      load('Cortex_reg13.mat', 'Vertices', 'Triangles'); % Contains: 'Vertices', 'Triangles', 'VertexNormals', 'TriangleNormals' 
+      tr = triangulation(Triangles, Vertices); 
       [TriangleAreas, TotalSurfaceArea] = GetSurfaceAreas(tr);
 %}
 %
@@ -25,6 +25,7 @@
 %     SAK(28-11-2010) -- Original.
 %     SAK(Nov 2013)   -- Move to git, future modification history is
 %                        there...
+%     PSL(Oct 2015)  -- TAG: MatlabR2015a
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [TriangleAreas, TotalSurfaceArea] = GetSurfaceAreas(tr, TheseTriangles)
