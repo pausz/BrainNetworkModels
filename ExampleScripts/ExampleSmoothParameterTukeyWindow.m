@@ -7,13 +7,16 @@ FirstPeriodDoubling_nu_se = 34.0e2;
 SecondPeriodDoubling_nu_se = 42.0e2;
 BeyondAbsenceValue_nu_se = 50.0e2;
 
-dt = 2^-3; %ms
+dt = 2^-4; %ms
 simulation_length = 25000; %ms
 
-first_chunk = LinearlyStable_nu_se * ones(5000 / dt);
-last_chunk  = first_chunk;
-w = tukeywin(simulation_length / dt, 0.75);
+fc = 5000;
+lc = 5000;
 
-nu_se = w * (BeyondAbsenceValue_nu_se - LinearlyStable_nu_se) + LinearlyStable_nu_se;
+first_chunk = LinearlyStable_nu_se * ones(fc / dt, 1);
+last_chunk  = LinearlyStable_nu_se * ones(lc / dt, 1);
+w = tukeywin((simulation_length - (fc+lc)) / dt, 0.15);
 
-plot(nu_se)
+nu_se = cat(1, first_chunk, w * (BeyondAbsenceValue_nu_se - LinearlyStable_nu_se) + LinearlyStable_nu_se, last_chunk);
+time = 0:dt:simulation_length-dt;
+plot(time, nu_se)
