@@ -70,12 +70,12 @@
 %% 
 exit
 %% Plotting
-  Select a few nodes
+  %% Select a few nodes
   options.Plotting.OnlyNodes = {'1'};
   
   % plot them
   FigureHandles = PlotNodeBifurcation(ForwardFxdPts, options);
-  
+  %%
   %Optionally over plot the Extrema found by back tracking
   options.Plotting.FigureHandles = FigureHandles;
   FigureHandles = PlotNodeBifurcation(BackwardFxdPts, options);
