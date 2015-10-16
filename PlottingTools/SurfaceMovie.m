@@ -98,7 +98,7 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Tim
   plot(TimeSeriesPaneHandle, Time, RegionalTimeseries + SeparateBy*repmat((1:NumberOfRegions),[TimeSteps,1]), 'linewidth', 2);
   % Hacky bit: remove and/or add functionality to highlight.
   hold;
-  plot(TimeSeriesPaneHandle, Time, RegionalTimeseries(:, 61) + SeparateBy*repmat(61,[TimeSteps,1]), 'r','linewidth', 3);
+  plot(TimeSeriesPaneHandle, Time, RegionalTimeseries(:, 60) + SeparateBy*repmat(60,[TimeSteps,1]), 'r','linewidth', 3);
 
   title(TimeSeriesTitle, 'interpreter', 'none');
   set(gca,'xlim',[Time(1) Time(end)]);
@@ -113,7 +113,7 @@ function [ThisFigure, TheMovie] = SurfaceMovie(Surface, TimeSeries, options, Tim
 
 %% Initialise Surface
   %Map timeseries to colormap indices
-  MAP = colormap(parula(250));
+  MAP = colormap(parula(128));
   ColourSteps = size(MAP,1);
   TimeSeries = max(fix(((TimeSeries-MinData) ./ (MaxData-MinData)) .* ColourSteps), 1); 
   EdgeColour = 'interp';

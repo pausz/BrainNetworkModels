@@ -27,7 +27,7 @@
 %     PSL(Jul 2015)   -- TAG: MatlabR2015a
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
+function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading, Title)
 
 %% Display info
  ThisScreenSize = get(0,'ScreenSize');
@@ -37,42 +37,62 @@ function [ThisFigure, SurfaceHandle] = SurfaceMesh(Surface, SurfaceShading)
 %% Initialise figure  
  ThisFigure = gcf;
  set(ThisFigure,'Position',FigureWindowSize);
- 
+%% Colours
+ MinData = 0.0025;
+ MaxData = 0.0404;
+ EdgeColour = 'none';
+ MAP = colormap(parula(256));
+ ColourSteps = size(MAP,1);
+ SurfaceShading = max(fix(((SurfaceShading-MinData) ./ (MaxData-MinData)) .* ColourSteps), 1); 
+
   
 %% Colour Surface by Region
  if nargin<2,
    SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
-     'Edgecolor', [0 0 0], 'FaceColor', [0.8 0.8 0.8]);
+     'Edgecolor', EdgeColour, 'FaceColor', [0.8 0.8 0.8]);
  else
    switch length(SurfaceShading),
      case size(Surface.Points,1)
        SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
-                             'Edgecolor', [0 0 0], 'FaceColor', 'interp', 'FaceVertexCData', SurfaceShading.'); %
+                             'Edgecolor', EdgeColour, 'FaceColor', 'interp', 'FaceVertexCData', SurfaceShading.'); %
    
      case size(Surface.ConnectivityList,1)
        SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:end,:) , 'Vertices', Surface.Points, ...
-                             'Edgecolor', [0 0 0], 'FaceColor', 'flat',  'FaceVertexCData', SurfaceShading.'); %
+                             'Edgecolor', EdgeColour, 'FaceColor', 'flat',  'FaceVertexCData', SurfaceShading.'); %
    end
-   title(['Shading represents:' inputname(2)], 'interpreter', 'none');
+   title(['T:' num2str(Title) ' ms'], 'interpreter', 'none');
  end
 
  % Axes and Mesh plotting properties
- material dull
- colormap(brewermap([], 'Reds'))
+ material shiny
+ set(SurfaceHandle,'FaceLighting','gouraud','AmbientStrength',0.3, 'SpecularStrength', 0.2)
+ 
+ lightangle(-90, 20)
+ view([-90, 0])
+ daspect([1 1 1])
+ %ColorBarHandle = colorbar;
+ %set(ColorBarHandle, 'location', 'southoutside')
+ %set(ColorBarHandle,'ytick',linspace(1,ColourSteps,2))
+ %set(ColorBarHandle, 'yticklabel', linspace(MinData, MaxData,2))
+ colormap(brewermap([256], 'Reds'))
+    
+  
+ %caxis(ThisFigure, 'manual');
+ caxis([1 ColourSteps]);
  
  xlabel('X (mm)');
  ylabel('Y (mm)');
  zlabel('Z (mm)');
  
- set(gca, 'CameraViewAngle', 7);
- %set(gca, 'CameraUpVector', [-0.25 0.44 0.86]);
- %set(gca, 'CameraPosition', [664 -1238 768]);
- view(3)
- grid on;
- light;
- lighting phong;
- camlight('left');
- daspect([1 1 1])
+%  set(gca, 'CameraViewAngle', 7);
+%  %set(gca, 'CameraUpVector', [-0.25 0.44 0.86]);
+%  %set(gca, 'CameraPosition', [664 -1238 768]);
+%  view(3)
+%  grid on;
+%  light;
+  lighting phong;
+%  camlight('left');
+%  daspect([1 1 1])
  
 %keyboard                       
 
