@@ -54,9 +54,20 @@ function S = Sigma(V,Qmax,Theta,sigma,Variant)
       S = Qmax ./ (1 + exp(-PiOnSqrt3.*((V-Theta)./sigma)));
     case {'inverse'},
       S(Qmax-V>0) = Theta + (sigma./PiOnSqrt3) .* log(V(Qmax-V>0)./(Qmax-V(Qmax-V>0)));
-    case{'derivative'}
+    case{'first'} % first order derivative wrt V
       w = exp(-PiOnSqrt3.*((V-Theta)./sigma));
       S = (PiOnSqrt3.*Qmax./sigma) .* w ./ ((1+w).*(1+w));
+    case{'second'} % second order derivative wrt V
+      w  = exp(-PiOnSqrt3.*((V-Theta)./sigma));
+      w2 = exp(-2*PiOnSqrt3.*((V-Theta)./sigma));
+      S = (((2*Qmax*(PiOnSqrt3)^2) / Theta^2) .* w2) ./ ((1 + w) .* (1 + w) .* (1 + w))  - ...
+          ((Qmax*(PiOnSqrt3)^2) / Theta^2) .* w ./ ((1 + w) .* (1 + w));
+    case{'third'} % third order derivative wrt V
+      w  = exp(-PiOnSqrt3.*((V-Theta)./sigma));
+      w2 = exp(-2*PiOnSqrt3.*((V-Theta)./sigma));
+      w3 = exp(-3*PiOnSqrt3.*((V-Theta)./sigma));
+      K = ((Qmax*(PiOnSqrt3)^3) / Theta^3);
+      S = K .* w ./ ((1 + w) .* (1 + w)) -  6 * K .* w2 ./ ((1 + w) .* (1 + w) .* (1 + w)) + 6 * K .* w3 ./ ((1 + w) .* (1 + w) .* (1 + w) .* (1 + w));        
     otherwise
       error(['BrainNetworkModels:' mfilename ':UnknownVariant'],'Unknown variant of the sigma function requested...');
   end
