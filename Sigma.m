@@ -16,8 +16,11 @@
 % USAGE:
 %{
       N = 100;
-      SigmaFunction = sigma(Sigma((0:N)./N));
-      figure, plot(0:(1./N):1, SigmaFunction); 
+      V = linspace(0, 6, N);
+      Theta = 3; % mV
+      sigma = 1; % mV
+      SigmaFunction = Sigma(V, 1, Theta, sigma);
+      figure, plot(V, SigmaFunction); 
 %}
 %
 % MODIFICATION HISTORY:
