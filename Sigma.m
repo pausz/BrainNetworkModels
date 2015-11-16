@@ -50,11 +50,21 @@ function S = Sigma(V,Qmax,Theta,sigma,Variant)
 %                              ^?
   S = inf(size(V));
   switch lower(Variant),
-    case{''}
+    case{'', 'sigmoid'}
       S = Qmax ./ (1 + exp(-PiOnSqrt3.*((V-Theta)./sigma)));
     case {'inverse'},
-      S(Qmax-V>0) = Theta + (sigma./PiOnSqrt3) .* log(V(Qmax-V>0)./(Qmax-V(Qmax-V>0)));
-    case{'first'} % first order derivative wrt V
+      Q = V;          % Only for consistency with the notation
+      S(Qmax-Q>0) = Theta + (sigma./PiOnSqrt3) .* log(Q(Qmax-Q>0)./(Qmax-Q(Qmax-Q>0)));
+    case{'inv_first'} % first order derivative wrt Q
+      Q = V;
+      S = Qmax * sigma ./ ((Qmax * PiOnSqrt3 .*Q) - PiOnSqrt3 * Q.^2);  
+    case{'inv_second'}
+      Q = V;
+      S = (Qmax * sigma * (Qmax - 2 .*Q)) ./ (PiOnSqrt3 * Q.^2 .*(Qmax - Q).^2);
+    case{'inv_third'}
+      Q = V;
+      S = ( 2 * Qmax * sigma * (Qmax^2 - 3 * Qmax .* Q + 3 * Q.^2)) ./  (PiOnSqrt3 * Q.^3 .* (Qmax - Q).^3);
+    case{'first'}     % first order derivative wrt V
       w = exp(-PiOnSqrt3.*((V-Theta)./sigma));
       S = (PiOnSqrt3.*Qmax./sigma) .* w ./ ((1+w).*(1+w));
     case{'second'} % second order derivative wrt V
