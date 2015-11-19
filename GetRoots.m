@@ -1,5 +1,5 @@
-%% Obtain roots of the transcendental steady state equation of the
-%% corticothalamic model (BRRW).
+%% Transcendental steady state equation of the
+%  corticothalamic model (BRRW).
 % ARGUMENTS:
 %         qe    -- Initial guess 
 %         nus   -- Vector with the eight corticothalamic synaptic weights
@@ -45,15 +45,18 @@ nurs = nus(8);
 A = nuee + nuei;
 B = nurs / nues;
 
+% Sigmoid
 S   = @(V) Sigma(V, qmax, theta, sigma, '');
-iS  = @(Q) Sigma(Q, qmax, theta, sigma, 'inverse'); 
+% First derivative of Sigmoid
 dS  = @(V) Sigma(V, qmax, theta, sigma, 'first'); 
+% Inverse of Sigmoid
+iS  = @(Q) Sigma(Q, qmax, theta, sigma, 'inverse'); 
+% First derivative of Inverse of Sigmoid
 diS = @(Q) Sigma(Q, qmax, theta, sigma, 'inv_first');
 
 Fy_plus  = [];
 Fy_minus = []; 
 % This equation assumes phin = 1; /s
-% TODO: generalize
 switch variant
     case{''}
         Fy       = iS(qe) - A .* qe - nues .*S(nuse  .* qe + nusr.* S(nure .*qe + B .* (iS(qe) - A .* qe)) + nusn);
