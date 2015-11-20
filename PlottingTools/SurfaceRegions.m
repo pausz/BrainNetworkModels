@@ -86,9 +86,9 @@ if length(ThisRegionIndex) < 1,
   step = (length(options.Connectivity.NodeStr)-1) / length(options.Connectivity.NodeStr);
   colorbar('YTick', 0.5:step:(length(options.Connectivity.NodeStr)-1), 'YTickLabel', options.Connectivity.NodeStr, 'Ylim', [0, length(options.Connectivity.NodeStr)-1]);
 else
-  FaceVertexData = ones(size(Surface.Points));
+  FaceVertexData = 0.77*ones(size(Surface.Points));
   FaceVertexData(options.Connectivity.RegionMapping == ThisRegionIndex,:) = repmat(ThisRegionColour, [sum(options.Connectivity.RegionMapping == ThisRegionIndex) 1]);
-  EdgeColour = [0.77 0.77 0.77];
+  EdgeColour = 'interp';
   ScatterHandle = scatter3(Surface.Points(options.Connectivity.RegionMapping == ThisRegionIndex, 1), Surface.Points(options.Connectivity.RegionMapping == ThisRegionIndex, 2), Surface.Points(options.Connectivity.RegionMapping == ThisRegionIndex, 3), 42, 'filled');
   set(ScatterHandle,'MarkerFaceColor',ThisVertexColour)
   legend(options.Connectivity.NodeStr(ThisRegionIndex))
@@ -97,9 +97,12 @@ end
   SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:NumberOfTriangles,:) , 'Vertices', Surface.Points, ...
     'Edgecolor',EdgeColour, 'FaceColor', 'interp', 'FaceVertexCData', FaceVertexData); %
 
-  set(SurfaceHandle, 'FaceAlpha', 0.5)
+  set(SurfaceHandle, 'FaceAlpha', 0.8)
 
   material dull
+  light;
+  lighting phong;
+  camlight('left');
   
   title(datestr(clock), 'interpreter', 'none');
   xlabel('X (mm)');
