@@ -9,20 +9,26 @@
 %         variant -- Variant of the steady state equation. '' or 'derivative'
 %
 % OUTPUT: 
-%         Fy=f(y) -- Transcendetal equation to find the steady states of
-%                    the excitatory population
+%         [Fy, Fy_plus, Fy_minus] Fy Transcendetal equation to find the steady states of
+%                    the excitatory population and its bounds (Fy_plus and Fy_minus)
 %
 % REQUIRES:
 %         Sigma()
 %
 % USAGE:
 %{
-      N = 100;
-      V = linspace(0, 6, N);
-      Theta = 3; % mV
-      sigma = 1; % mV
-      SigmaFunction = Sigma(V, 1, Theta, sigma);
-      figure, plot(V, SigmaFunction); 
+      N = 1000;
+      qe = linspace(0, 340, N);
+      theta = 0.003;  % mV
+      sigma = 0.001;  % mV
+      qmax  = 340;    % /s
+      nus   = [0.0078   -0.0099    0.0009    0.0027   -0.0013    0.0066 0.0002    0.0001];
+      [Fy, Fyp, Fym] = GetRoots(qe, nus, qmax, theta, (pi/sqrt(3))*sigma);
+      figure, plot(qe, [Fy; Fy_plus; Fy_minus);
+      hold on;
+      [dFy, ~, ~] = GetRoots(qe, nus, qmax, theta, (pi/sqrt(3))*sigma, 'derivative');
+      figure, plot(qe, [Fy; Fy_plus; Fy_minus);
+      
 %}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

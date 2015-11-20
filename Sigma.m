@@ -67,12 +67,12 @@ function S = Sigma(V,Qmax,Theta,sigma,Variant)
     case{'first'}     % first order derivative wrt V
       w = exp(-PiOnSqrt3.*((V-Theta)./sigma));
       S = (PiOnSqrt3.*Qmax./sigma) .* w ./ ((1+w).*(1+w));
-    case{'second'} % second order derivative wrt V
+    case{'second'}    % second order derivative wrt V
       w  = exp(-PiOnSqrt3.*((V-Theta)./sigma));
       w2 = exp(-2*PiOnSqrt3.*((V-Theta)./sigma));
       S = (((2*Qmax*(PiOnSqrt3)^2) / Theta^2) .* w2) ./ ((1 + w) .* (1 + w) .* (1 + w))  - ...
           ((Qmax*(PiOnSqrt3)^2) / Theta^2) .* w ./ ((1 + w) .* (1 + w));
-    case{'third'} % third order derivative wrt V
+    case{'third'}    % third order derivative wrt V
       w  = exp(-PiOnSqrt3.*((V-Theta)./sigma));
       w2 = exp(-2*PiOnSqrt3.*((V-Theta)./sigma));
       w3 = exp(-3*PiOnSqrt3.*((V-Theta)./sigma));
