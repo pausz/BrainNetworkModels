@@ -814,8 +814,9 @@ function [Connectivity] = GetConnectivity(Connectivity)
          
                             
      %Load the connectivity matrix data
-     load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_07032014_5scales_corrected.mat']); %Contains: 83 and 1015 ROIs connectomes
+     %load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_07032014_5scales_corrected.mat']); %Contains: 83 and 1015 ROIs connectomes
 
+     load(['ConnectivityData' Sep 'EPFL_diffusion_connectivity_data_07032014_5scales.mat']);
      %Load centroids - region centres
      load(['ConnectivityData' Sep 'EPFL_centroids_04022014.mat']);
      

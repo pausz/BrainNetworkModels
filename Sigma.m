@@ -64,7 +64,7 @@ function S = Sigma(V,Qmax,Theta,sigma,Variant)
     case{'inv_third'}
       Q = V;
       S = 2*(sigma/PiOnSqrt3) * (1./(Qmax - Q).^3 + 1./Q.^3);
-    case{'first'}     % first order derivative wrt V
+    case{'first', 'derivative'}     % first order derivative wrt V
       w = exp(-PiOnSqrt3.*((V-Theta)./sigma));
       S = (PiOnSqrt3.*Qmax./sigma) .* w ./ ((1+w).*(1+w));
     case{'second'}    % second order derivative wrt V

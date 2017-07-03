@@ -6,10 +6,10 @@
 %         theta -- Voltage threshold
 %         qmax  -- Maximum firing rate
 %         sigma -- Width of transition
-%         variant -- Variant of the steady state equation. '' or 'derivative'
+%         variant -- Variant of the steady state equation: '' or 'derivative'
 %
 % OUTPUT: 
-%         [Fy, Fy_plus, Fy_minus] Fy Transcendetal equation to find the steady states of
+%         [Fy, Fy_plus, Fy_minus] where Fy Transcendetal equation to find the steady states of
 %                    the excitatory population and its bounds (Fy_plus and Fy_minus)
 %
 % REQUIRES:
@@ -38,7 +38,8 @@ function [Fy, Fy_plus, Fy_minus] = GetRoots(qe, nus, qmax, theta, sigma, variant
 if nargin < 6,
     variant = '';
 end
-  
+
+% Assign nus to new variables so it is easier to compare with Eqs in papers
 nuee = nus(1);
 nuei = nus(2);
 nues = nus(3);
