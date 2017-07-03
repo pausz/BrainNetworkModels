@@ -135,6 +135,24 @@ function options = SetInitialConditions(options)
         case{'eo'}
           MagicNumber1 = 0.0063;
           MagicNumber2 = 0.0055;
+        case{'hyperarousal', 'ha'}
+          % first stable steady-state for default ha parameters
+          v_e   = -2.243312227618;   % (mV)
+          v_s   = -4.213657016532;   % (mV) 
+          v_r   =  1.234716071123;   % (mV) 
+          phie =  0.0061735614377935;  % (/ms)           
+          %phis =  0.0037029790735937; % (/ms)
+          %phir =  0.0150100437430528; % (/ms)
+          
+          options.Dynamics.InitialConditions.phi_e  = phie .* ones(maxdelayiters, NumberOfNodes);
+          options.Dynamics.InitialConditions.dphi_e = zeros(1,NumberOfNodes);
+          options.Dynamics.InitialConditions.V_e    = v_e.* ones(maxdelayiters, NumberOfNodes);
+          options.Dynamics.InitialConditions.dV_e   = zeros(1,NumberOfNodes);
+          options.Dynamics.InitialConditions.V_s    = v_s.* ones(maxdelayiters, NumberOfNodes);
+          options.Dynamics.InitialConditions.dV_s   = zeros(1,NumberOfNodes);
+          options.Dynamics.InitialConditions.V_r    = v_r.* ones(maxdelayiters, NumberOfNodes);
+          options.Dynamics.InitialConditions.dV_r   = zeros(1,NumberOfNodes);
+          return  
         otherwise
       end
       

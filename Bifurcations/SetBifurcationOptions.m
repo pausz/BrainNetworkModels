@@ -53,6 +53,30 @@ function options = SetBifurcationOptions(options)
         case{'tonicclonic' 'grandmal'}
           defaults.BifurcationParameter = 'csf';
         
+        case{'hyperarousal', 'ha'}
+            switch lower(options.Bifurcation.BifurcationParameter)
+                case{'nu_sn'}
+                    defaults.InitialControlValue           = 25e2; %Must be strongly stable fixed point...
+                    defaults.BifurcationParameterIncrement =  0.625e2;
+                    defaults.TargetControlValue            = 45.0e2;
+                case{'nu_ee'}
+                    defaults.InitialControlValue           = 24.0e2; %Must be strongly stable fixed point...
+                    defaults.BifurcationParameterIncrement =  0.625e2;
+                    defaults.TargetControlValue            = 25.0e2;
+                case{'nu_sr'}
+                    defaults.InitialControlValue           = -25.0e2; %Must be strongly stable fixed point...
+                    defaults.BifurcationParameterIncrement =  0.625e2;
+                    defaults.TargetControlValue            = -18.0e2;
+                case{'nu_se'}
+                    defaults.InitialControlValue           =  20.0e2; %Must be strongly stable fixed point...
+                    defaults.BifurcationParameterIncrement =  0.625e2;
+                    defaults.TargetControlValue            =  45.0e2;
+            end
+          defaults.ErrorTolerance                =  1.0e-6;
+          defaults.MaxContinuations = 65; %set to 0 for interactive
+          defaults.IntegrationsToMergeForNonstable = 10; 
+          defaults.AttemptForceFixedPoint = false;
+        
         otherwise
       end
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

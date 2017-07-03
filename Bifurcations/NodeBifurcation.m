@@ -96,7 +96,7 @@
 %      "binning" scale when doing FindUnique and Merge, should be normalised...
 
 
-function [ForwardFxdPts BackwardFxdPts options] = NodeBifurcation(options)
+function [ForwardFxdPts, BackwardFxdPts, options] = NodeBifurcation(options)
   if isoctave(),
     initial_more_state = page_screen_output;
     more off
@@ -135,7 +135,7 @@ function [ForwardFxdPts BackwardFxdPts options] = NodeBifurcation(options)
     
     %Integrate
     options.Bifurcation.AttemptForceFixedPoint = WorthForcingFixedPoint;
-    [TheseFxdPts NumberOfForwardFxdPts(CurrentBifStep,:) options ForwardStableSolutionFlag] = IntegrateUntilStable(options);
+    [TheseFxdPts, NumberOfForwardFxdPts(CurrentBifStep,:), options, ForwardStableSolutionFlag] = IntegrateUntilStable(options);
     if WorthForcingFixedPoint && any(NumberOfForwardFxdPts(CurrentBifStep,:) > NumberIfAllAreFixedPoints), %TODO: consider weakening from all(not-fixed-point) to any(not-fixed-point)
       WorthForcingFixedPoint = false;
       if options.Other.verbosity > 0,
@@ -205,7 +205,7 @@ function [ForwardFxdPts BackwardFxdPts options] = NodeBifurcation(options)
         end
          
         options.BifurcationOptions.AttemptForceFixedPoint = false;
-        [TheseFxdPts NumberOfBackwardFxdPts(CurrentBifStep,:) options BackwardStableSolutionFlag] = IntegrateUntilStable(options);
+        [TheseFxdPts, NumberOfBackwardFxdPts(CurrentBifStep,:), options, BackwardStableSolutionFlag] = IntegrateUntilStable(options);
         if BackwardStableSolutionFlag,
           if options.Other.verbosity > 0,
             disp(['Backward result stable to within requested ErrorTolerance of ' num2str(options.Bifurcation.ErrorTolerance)  '...']);

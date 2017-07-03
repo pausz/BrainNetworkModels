@@ -134,7 +134,6 @@ function Dynamics = SetDynamicParameters(Dynamics)
          defaults.nu_sn   =  10.0e2; %(mV ms) - Nonspecific subthalamic input onto specific thalamic nuclei gain/coupling
          defaults.nu_re   =   2.0e2; %(mV ms) - Excitatory cortical to thalamic reticular nucleus gain/coupling
          defaults.nu_rs   =   2.0e2; %(mV ms) - Specific to reticular thalamic nuclei gain/coupling
-         
        otherwise
      end
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -249,7 +248,29 @@ function Dynamics = SetDynamicParameters(Dynamics)
          defaults.nu_sn   =  10.0e2; %(mV ms) - Nonspecific subthalamic input onto specific thalamic nuclei gain/coupling
          defaults.nu_re   =   2.0e2; %(mV ms) - Excitatory cortical to thalamic reticular nucleus gain/coupling
          defaults.nu_rs   =   2.0e2; %(mV ms) - Specific to reticular thalamic nuclei gain/coupling
-         
+       case{'hyperarousal', 'ha'} %Rest-state eyes-closed with five steady-states
+         defaults.Theta_e =  12.92;   %(mV)    - Mean neuronal threshold for Excitatory cortical population.
+         defaults.Theta_s =  12.92;   %(mV)    - Mean neuronal threshold for specific thalamic population.
+         defaults.Theta_r =  12.92;   %(mV)    - Mean neuronal threshold for reticular thalamic population.
+         defaults.sigma_e =   6.892437584090027;   %(mV)    - Threshold variability for Excitatory cortical population.
+         defaults.sigma_s =   6.892437584090027;   %(mV)    - Threshold variability for specific thalamic population.
+         defaults.sigma_r =   6.892437584090027;   %(mV)    - Threshold variability for reticular thalamic population.
+         defaults.Qmax    =   0.340; %?(/ms)  - Maximum firing rate
+         defaults.v       =   9.975999999999999;  %(mm/ms) - Conduction velocity
+         defaults.r_e     =  86.0;   %(mm)    - Mean range of axons
+         %%%DERIVED%%% defaults.gamma_e = 0.116;   %(/ms) - Ratio of conduction velocity to mean range of axons
+         defaults.alfa    =   0.0833333333333333;  %(/ms)   - Inverse decay time of membrane potential... current values a=50; b=4*a; are consistent
+         defaults.btta    =   0.7692307692307693;  %(/ms)   - Inverse rise time of membrane potential ... with parmaters relevant to sleep stage II.
+         defaults.CTdelay =   42.5;   %(ms)    - Corticothalamic delay
+         defaults.TCdelay =   42.5;   %(ms)    - Thalamocortical delay
+         defaults.nu_ee   =  23.19e2; %(mV ms) - Excitatory corticocortical gain/coupling
+         defaults.nu_ei   = -30.22754433816e2; %(mV ms) - Inhibitory corticocortical gain/coupling
+         defaults.nu_es   =   5.67477958936e2; %(mV ms) - Specific thalamic nuclei to cortical gain/coupling
+         defaults.nu_se   =  34.47358202840e2; %(mV ms) - Cortical to specific thalamic nuclei gain/coupling... turn seizure on and off
+         defaults.nu_sr   = -19.3800000e2;     %(mV ms) - Thalamic reticular nucleus to specific thalamic nucleus gain/coupling
+         defaults.nu_sn   =  35.93330094190e2; %(mV ms) - Nonspecific subthalamic input onto specific thalamic nuclei gain/coupling
+         defaults.nu_re   =   1.69589904083e2; %(mV ms) - Excitatory cortical to thalamic reticular nucleus gain/coupling
+         defaults.nu_rs   =   0.50700361872e2; %(mV ms) - Specific to reticular thalamic nuclei gain/coupling         
        otherwise
      end
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

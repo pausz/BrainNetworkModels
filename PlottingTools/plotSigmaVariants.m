@@ -1,11 +1,11 @@
-
+%% Script to plot the sigmoid function, inverse and derivatives for steadfy state study
 %% Plot Sigmoid and its derivatives
 Variant = {'', 'first', 'second', 'third'};
 YLabels = {'S(V)', 'dS(V) / dV', 'd^{2}S(V) / dV^{2}','d^{3}S(V) / dV^{3}'};
 XLabel =  {'V [Volt]'};
 N = 100;
 V = linspace(-0.01, 0.03, N);
-Theta = 0.013;  % V
+Theta = 0.013;   % V
 sigma = 0.0068;  % V
 Qmax = 340;      % /s
 

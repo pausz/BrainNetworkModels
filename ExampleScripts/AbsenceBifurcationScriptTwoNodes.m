@@ -43,9 +43,15 @@
   options.Dynamics = SetDynamicParameters(options.Dynamics);
   options = SetIntegrationParameters(options);
   
+  % Change r_ee and v_ee
+  options.Dynamics.v =   10;
+  options.Dynamics.r_e = 125;
+  
+  % Set intregration
   options.Integration.dt = 2^-3;
   options.Integration.iters = 2^14;
   
+  % Set derived parameters
   options = SetDerivedParameters(options);
   options = SetInitialConditions(options);
   

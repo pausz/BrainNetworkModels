@@ -103,8 +103,9 @@ function options = SetDerivedParameters(options)
      options.Dynamics.apb     = options.Dynamics.alfa + options.Dynamics.btta;
      options.Dynamics.dtcsf   = options.Integration.dt*options.Dynamics.csf;
     
-     options.Dynamics.phi_n = 1e-3 + 0.05e-3*randn(options.Integration.iters+options.Integration.maxdelayiters, options.Connectivity.NumberOfNodes);
-     
+     %options.Dynamics.phi_n = 1e-3 + 0.05e-3*randn(options.Integration.iters+options.Integration.maxdelayiters, options.Connectivity.NumberOfNodes);
+     options.Dynamics.phi_n = 1e-3 + 0.*ones(options.Integration.iters+options.Integration.maxdelayiters, options.Connectivity.NumberOfNodes);
+
      if numel(options.Dynamics.CTdelay) == 1,
        options.Dynamics.CTlidelay = GetLinearIndex(options.Dynamics.CTdelay.*ones(1,options.Connectivity.NumberOfNodes), options.Integration.iters, options.Integration.maxdelayiters, options.Integration.dt);
      else
