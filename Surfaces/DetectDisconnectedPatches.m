@@ -55,8 +55,8 @@ if visual_debug
     % This works because of the sorting we did above.
   
    h = plot(G, 'EdgeColor', [0.5 0.5 0]);
-   highlight(h,[1:length(v_idx)],'NodeColor','r')
-   highlight(h,[length(v_idx)+1:size(LocalVertices, 1)],'NodeColor','g')
+   highlight(h,1:length(v_idx),'NodeColor','r')
+   highlight(h,length(v_idx)+1:size(LocalVertices, 1),'NodeColor','g')
    varargout{1} = h;
 end
 
