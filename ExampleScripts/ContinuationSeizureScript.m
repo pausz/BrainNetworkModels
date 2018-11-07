@@ -31,11 +31,13 @@ tic;
 %%Load default parameters for specified connectivity and dynamics
 options.Connectivity = GetConnectivity(options.Connectivity);
 options.Dynamics = SetDynamicParameters(options.Dynamics);
+options.Dynamics.v = 10;
+options.Dynamics.r_e = 50;
 options = SetIntegrationParameters(options);
 
 %% Integration   
 options.Integration.dt = 2^-3;
-options.Integration.iters = 2^14;
+options.Integration.iters = 2^16;
 
 
 %% Update Parameters  
@@ -46,7 +48,7 @@ options = SetInitialConditions(options);
 LinearlyStable_nu_se = 1000;
 Supercritical_nu_se  = 1800;
 FirstPeriodDoubling_nu_se = 3400;
-SecondPeriodDoubling_nu_se = 5500;
+SecondPeriodDoubling_nu_se = 5000;
 SeizureRegion = '1';
 SeizureRegionIndex = find(strcmpi(options.Connectivity.NodeStr, SeizureRegion));
  
@@ -118,15 +120,15 @@ Store_phi_e = [];
  end
 
  
-%% Post seizure
- options.Dynamics.nu_se =LinearlyStable_nu_se;
- Continuations = 2;
- for k = 1:Continuations,
-   disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for seizure offset...'])
-   [phi_e, dphi_e, V_e, dV_e, V_s, dV_s, V_r, dV_r, t, options] = BRRW_heun(options);
-   Store_phi_e = [Store_phi_e ; phi_e(1:DSF_t:end, :)];
-   options = UpdateInitialConditions(options);
- end
+% %% Post seizure
+%  options.Dynamics.nu_se =LinearlyStable_nu_se;
+%  Continuations = 2;
+%  for k = 1:Continuations,
+%    disp(['Continuation ' num2str(k) ' of ' num2str(Continuations) ' for seizure offset...'])
+%    [phi_e, dphi_e, V_e, dV_e, V_s, dV_s, V_r, dV_r, t, options] = BRRW_heun(options);
+%    Store_phi_e = [Store_phi_e ; phi_e(1:DSF_t:end, :)];
+%    options = UpdateInitialConditions(options);
+%  end
 
 toc;
 
