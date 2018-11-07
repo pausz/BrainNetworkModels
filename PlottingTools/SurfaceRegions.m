@@ -1,21 +1,25 @@
 %% Colour the cortical surface by region. 
 %
 % ARGUMENTS:
-%        Surface -- TriRep object of cortical surface.
-%        options -- 
+%        Surface -- a Matlab's triangulation object with the cortical surface.
+%        options -- a structure that contains the associated Connectivity
+%                   matrix (weigths) and RegionMapping.
+%        ThisRegionIndex -- An integer to select one specific region. It
+%                           should be included in RegionMapping.
+%        ThisColourMap -- N x 3 array defining a colourmap, where N is the number of vertices 
 %
 % OUTPUT: 
 %        ThisFigure        -- Handle to overall figure object.
-%        SurfaceHandle    -- Handle to patch object, cortical surface.
+%        SurfaceHandle     -- Handle to patch object, cortical surface.
 %
 % REQUIRES: 
-%        TriRep -- A Matlab object, not yet available in Octave.
+%        triangulation -- A Matlab object, not yet available in Octave.
 %
 % USAGE:
 %{     
        ThisSurface = 'reg13';
        load(['Surfaces' filesep 'Cortex_' ThisSurface '.mat'], 'Vertices', 'Triangles');  % Contains: 'Vertices', 'Triangles', 'VertexNormals', 'TriangleNormals'
-       tr = TriRep(Triangles, Vertices);
+       tr = triangulation(Triangles, Vertices);
 
        options.Connectivity.WhichMatrix = 'O52R00_IRP2008';
        options.Connectivity.hemisphere = 'both';
@@ -33,17 +37,35 @@
 %     SAK(13-01-2011) -- Original.
 %     SAK(Nov 2013)   -- Move to git, future modification history is
 %                        there...
+%     PSL(Jul 2015)   -- TAG: MatlabR2015a
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [ThisFigure SurfaceHandle] = SurfaceRegions(Surface, options, ThisColourMap)
+function [ThisFigure, SurfaceHandleOne] = SurfaceRegions(Surface, options, ThisRegionIndex, ThisColourMap)
 %% Set any argument that weren't specified
-  if nargin < 3,
-    ThisColourMap = 'RegionColours74';
+  if nargin < 3
+     ThisRegionIndex = 1;
+     ThisColourMap  = 'RegionColours74';
   end
+  % I'm going to assume ThisRegionIndex was passed as an argument
+  if nargin < 4
+    ThisColourMap  = 'RegionColours74';
+  end
+          
 
 %% Data info
-  NumberOfRegions = length(unique(options.Connectivity.RegionMapping));
+NumberOfRegions = length(unique(options.Connectivity.RegionMapping));
+ThisRegionColour = [0.75 0.75 0.75];
+ThisVertexColour = [1 0 0];
+NumberOfVertices = size(Surface.Points, 1);
+NumberOfTriangles = size(Surface.ConnectivityList, 1);
+
+%% If the anatomical labels are not there
+if ~isfield(options.Connectivity, 'NodeStr')
+    for ns = 1:NumberOfRegions, 
+        options.Connectivity.NodeStr{ns} = num2str(ns);
+    end
+end
 
 %% Display info
   ThisScreenSize = get(0,'ScreenSize');
@@ -52,25 +74,57 @@ function [ThisFigure SurfaceHandle] = SurfaceRegions(Surface, options, ThisColou
 %% Initialise figure  
   ThisFigure = figure;
   set(ThisFigure,'Position',FigureWindowSize);
-  
-  load(ThisColourMap); 
-  colormap(RegionColours)
+%% Get Colourmap  
+  if ischar(ThisColourMap)
+      load(ThisColourMap);
+      cmap = map; 
+  else
+      cmap = ThisColourMap;
+  end
+  colormap(ThisFigure, cmap)
 
-%%% RegionLabels = cellfun(@(x) x(2:end), options.Connectivity.NodeStr(1:end/2), 'UniformOutput', false);
 
-%% Colour Surface by Region
-  SurfaceHandle = patch('Faces', Surface.Triangulation(1:1:end,:) , 'Vertices', Surface.X, ...
-    'Edgecolor','interp', 'FaceColor', 'interp', 'FaceVertexCData', options.Connectivity.RegionMapping.'); %
+%% Colour Surface by Region or Colour One Region and overlay a 3D scatter plot.
+
+% Handle the cases for colouring all regions or just one
+if length(ThisRegionIndex) < 1
+  FaceVertexData = options.Connectivity.RegionMapping;
+  EdgeColour = 'interp';
+
+  % Check that we don't have several hundreds regions - otherwise labels do not fit comfrotably in the screen 
+  if NumberOfRegions <= 80,
+    step = (length(options.Connectivity.NodeStr)-1) / length(options.Connectivity.NodeStr);
+    colorbar('YTick', 0.5:step:(length(options.Connectivity.NodeStr)-1), 'YTickLabel', options.Connectivity.NodeStr, 'Ylim', [0, length(options.Connectivity.NodeStr)-1]);
+  end
+else
+  FaceVertexData = 0.77*ones(size(Surface.Points));
+  FaceVertexData(options.Connectivity.RegionMapping == ThisRegionIndex,:) = repmat(ThisRegionColour, [sum(options.Connectivity.RegionMapping == ThisRegionIndex) 1]);
+  EdgeColour = 'interp';
+  ScatterHandle = scatter3(Surface.Points(options.Connectivity.RegionMapping == ThisRegionIndex, 1), ...
+                           Surface.Points(options.Connectivity.RegionMapping == ThisRegionIndex, 2), ...
+                           Surface.Points(options.Connectivity.RegionMapping == ThisRegionIndex, 3), ..
+                           42, 'filled');
+  set(ScatterHandle,'MarkerFaceColor',ThisVertexColour)
+  legend(options.Connectivity.NodeStr(ThisRegionIndex))
+  hold;
+end    
+  SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:NumberOfTriangles) , ..
+                        'Vertices', Surface.Points, ...
+                        'Edgecolor',EdgeColour, ...
+                        'FaceColor', 'interp', ...
+                        'FaceVertexCData', FaceVertexData.'); %
+
+  set(SurfaceHandle, 'FaceAlpha', 0.8)
+
   material dull
+  light;
+  lighting phong;
+  camlight('left');
   
-  %title(['???'], 'interpreter', 'none');
+  title(datestr(clock), 'interpreter', 'none');
   xlabel('X (mm)');
   ylabel('Y (mm)');
   zlabel('Z (mm)');
-  
-  step = (length(options.Connectivity.NodeStr)-1) / length(options.Connectivity.NodeStr);
-  colorbar('YTick', 0.5:step:(length(options.Connectivity.NodeStr)-1), 'YTickLabel', options.Connectivity.NodeStr, 'Ylim', [0, length(options.Connectivity.NodeStr)-1]);
-  
   daspect([1 1 1])
 %keyboard                       
 
