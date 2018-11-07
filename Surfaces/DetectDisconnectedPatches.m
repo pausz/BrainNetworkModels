@@ -25,7 +25,7 @@
 % that belongs to one region
 % This script tries t
 
-function [number_of_components, varargout] = DetectDisconnectedPatches(TR, v_idx, visual_debugging)
+function [number_of_components, varargout] = DetectDisconnectedPatches(TR, v_idx, visual_debug)
 if nargin < 3
     visual_debug = 0;
 end
