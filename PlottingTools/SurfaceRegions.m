@@ -41,23 +41,23 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [ThisFigure, SurfaceHandleOne] = SurfaceRegions(Surface, options, ThisColourMap, ThisRegionIndex)
+function [ThisFigure, SurfaceHandleOne] = SurfaceRegions(Surface, options, ThisRegionIndex,ThisColourMap)
 %% Set any argument that weren't specified
-  if nargin < 3,
+  if nargin < 3
+     ThisRegionIndex = 1;
+  end
+  if nargin < 4
     ThisColourMap  = 'RegionColours74';
     ThisRegionIndex = []; 
-  end
-  if nargin < 4,
-     ThisRegionIndex = [];
   end
           
 
 %% Data info
-  NumberOfRegions = length(unique(options.Connectivity.RegionMapping));
-  ThisRegionColour = [0.75 0.75 0.75];
-  ThisVertexColour = [1 0 0];
-  NumberOfVertices = size(Surface.Points, 1);
-  NumberOfTriangles = size(Surface.ConnectivityList, 1);
+NumberOfRegions = length(unique(options.Connectivity.RegionMapping));
+ThisRegionColour = [0.75 0.75 0.75];
+ThisVertexColour = [1 0 0];
+NumberOfVertices = size(Surface.Points, 1);
+NumberOfTriangles = size(Surface.ConnectivityList, 1);
 
 %% Display info
   ThisScreenSize = get(0,'ScreenSize');
@@ -67,7 +67,7 @@ function [ThisFigure, SurfaceHandleOne] = SurfaceRegions(Surface, options, ThisC
   ThisFigure = figure;
   set(ThisFigure,'Position',FigureWindowSize);
 %% Get Colourmap  
-  if ischar(ThisColourMap),
+  if ischar(ThisColourMap)
       load(ThisColourMap);
       cmap = map; 
   else
@@ -83,8 +83,8 @@ function [ThisFigure, SurfaceHandleOne] = SurfaceRegions(Surface, options, ThisC
 if length(ThisRegionIndex) < 1,
   FaceVertexData = options.Connectivity.RegionMapping;
   EdgeColour = 'interp';
-  step = (length(options.Connectivity.NodeStr)-1) / length(options.Connectivity.NodeStr);
-  colorbar('YTick', 0.5:step:(length(options.Connectivity.NodeStr)-1), 'YTickLabel', options.Connectivity.NodeStr, 'Ylim', [0, length(options.Connectivity.NodeStr)-1]);
+  %step = (length(options.Connectivity.NodeStr)-1) / length(options.Connectivity.NodeStr);
+  %colorbar('YTick', 0.5:step:(length(options.Connectivity.NodeStr)-1), 'YTickLabel', options.Connectivity.NodeStr, 'Ylim', [0, length(options.Connectivity.NodeStr)-1]);
 else
   FaceVertexData = 0.77*ones(size(Surface.Points));
   FaceVertexData(options.Connectivity.RegionMapping == ThisRegionIndex,:) = repmat(ThisRegionColour, [sum(options.Connectivity.RegionMapping == ThisRegionIndex) 1]);
@@ -94,8 +94,8 @@ else
   legend(options.Connectivity.NodeStr(ThisRegionIndex))
   hold;
 end    
-  SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:NumberOfTriangles,:) , 'Vertices', Surface.Points, ...
-    'Edgecolor',EdgeColour, 'FaceColor', 'interp', 'FaceVertexCData', FaceVertexData); %
+  SurfaceHandle = patch('Faces', Surface.ConnectivityList(1:1:NumberOfTriangles) , 'Vertices', Surface.Points, ...
+    'Edgecolor',EdgeColour, 'FaceColor', 'interp', 'FaceVertexCData', FaceVertexData.'); %
 
   set(SurfaceHandle, 'FaceAlpha', 0.8)
 
