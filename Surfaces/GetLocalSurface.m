@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [LocalVertices LocalTriangles GlobalVertexIndices GlobalTriangleIndices nRing] = GetLocalSurface(tr, FocalVertex, Neighbourhood)
+function [LocalVertices, LocalTriangles, GlobalVertexIndices, GlobalTriangleIndices, nRing] = GetLocalSurface(tr, FocalVertex, Neighbourhood)
 %% Set any argument that weren't specified
  if nargin<3,
    Neighbourhood = 1;
