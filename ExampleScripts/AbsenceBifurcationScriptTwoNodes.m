@@ -44,8 +44,8 @@
   options = SetIntegrationParameters(options);
   
   % Change r_ee and v_ee
-  options.Dynamics.v =   10;
-  options.Dynamics.r_e = 125;
+  options.Dynamics.v =   6;
+  options.Dynamics.r_e =150;
   
   % Set intregration
   options.Integration.dt = 2^-3;

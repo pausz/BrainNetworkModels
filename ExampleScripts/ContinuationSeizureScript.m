@@ -46,7 +46,7 @@ options = SetInitialConditions(options);
 LinearlyStable_nu_se = 1000;
 Supercritical_nu_se  = 1800;
 FirstPeriodDoubling_nu_se = 3400;
-SecondPeriodDoubling_nu_se = 4200;
+SecondPeriodDoubling_nu_se = 5500;
 SeizureRegion = '1';
 SeizureRegionIndex = find(strcmpi(options.Connectivity.NodeStr, SeizureRegion));
  
