@@ -25,7 +25,7 @@
 % that belongs to one region
 % This script tries t
 
-function [number_of_components, varargout] = DetectDisconnectedPatches(TR, v_idx, visual_debug)
+function [number_of_components, largest_component, this_size, varargout] = DetectDisconnectedPatches(TR, v_idx, visual_debug)
 if nargin < 3
     visual_debug = 0;
 end
@@ -39,7 +39,7 @@ end
     t = tr_local.ConnectivityList(:, 2);
     u = tr_local.ConnectivityList(:, 3);
 
-% Remove duplicate edges - matlab does not support this
+% Remove duplicate edges - matlab's graph fn does not support it
     st = unique(sort([s, t],2),'rows');
     tu = unique(sort([t, u],2),'rows');
     su = unique(sort([u, s],2),'rows');
@@ -48,18 +48,26 @@ end
 
     G = addedge(G, unique_edge_list(:, 1), unique_edge_list(:, 2));
     [bins] = conncomp(G);
-
     number_of_components = max(bins);
 
+    % Get largest component based on focal vertices
+    [n, e] = histcounts(bins(1:length(v_idx)));
+    
+    these_bins = e(2:end)-e(1); 
+    [this_size, this_bin] = max(n);
+    
+    largest_component = these_bins(this_bin);
+    
 % Visual debugging 
 if visual_debug
     % Take the first v_idx nodes -- those are the central focal vertices
     % This works because of the sorting we did above.
-  
-   h = plot(G, 'EdgeColor', [0.5 0.5 0]);
+   GraphPlotFigureHandle = figure;
+   GraphPlotHandle = plot(G, 'EdgeColor', [0.5 0.5 0]);
    highlight(h,1:length(v_idx),'NodeColor','r')
    highlight(h,length(v_idx)+1:size(LocalVertices, 1),'NodeColor','g')
-   varargout{1} = h;
+   varargout{1} = GraphPlotFigureHandle;
+   varargout{2} = GraphPlotHandle;
 end
 
 end
