@@ -21,6 +21,8 @@ uniqueEdgeList = unique(sort(edge_list,2),'rows');
 G = addedge(G, uniqueEdgeList(:, 1), uniqueEdgeList(:, 2));
 [bins] = conncomp(G);
 
+number_of_components = max(bins);
+
 % Take the first v_idx nodes -- those are the central focal vertices
 % This works because of the sorting we did above.
 
@@ -28,14 +30,9 @@ LocalVertexColor = [1 0 0];
 OtherVertexColor = [0 1 0];
 
   
-
-
-h = plot(G, 'EdgeColor', [0.5 0.5 0]);
-highlight(h,[1:length(v_idx)],'NodeColor','r')
-highlight(h,[length(v_idx)+1:size(LocalVertices, 1)],'NodeColor','g')
+%h = plot(G, 'EdgeColor', [0.5 0.5 0]);
+%highlight(h,[1:length(v_idx)],'NodeColor','r')
+%highlight(h,[length(v_idx)+1:size(LocalVertices, 1)],'NodeColor','g')
 
 
 end
-
-
-
