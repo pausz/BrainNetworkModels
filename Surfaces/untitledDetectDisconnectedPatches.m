@@ -4,7 +4,9 @@
 
 function [number_of_components] = untitledDetectDisconnectedPatches(TR, v_idx)
 
-[LocalVertices, LocalTriangles, GlobalVertexIndices] = GetLocalSurface(TR, v_idx.', 1);
+[LocalVertices, LocalTriangles, ~] = GetLocalSurface(TR, v_idx.', 1);
+
+tr_local = triangulation(LocalTriangles, LocalVertices(:, 1), LocalVertices(:, 2), LocalVertices(:, 3));
 
 G = graph;
 s = tr_local.ConnectivityList(:, 1);
