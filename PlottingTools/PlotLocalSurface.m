@@ -44,11 +44,11 @@ function LocalSurfaceFigureHandle = PlotLocalSurface(TR, FocalVertex, Neighbourh
     normals = zeros(size(TR.X));
   end
   
-  NumberOfVertices = size(TR.X, 1);
+  NumberOfVertices  = size(TR.X, 1);
   NumberOfTriangles = size(TR.Triangulation, 1);
-  NumberOfNormals = size(normals, 1);
+  NumberOfNormals   = size(normals, 1);
   
-%% Get the local patch of surface
+%% Get the local patch of surface from a focal vertex
   switch NumberOfNormals,
     case NumberOfVertices
       [LocalVertices, LocalTriangles, GlobalVertexIndices] = GetLocalSurface(TR, FocalVertex, Neighbourhood);
