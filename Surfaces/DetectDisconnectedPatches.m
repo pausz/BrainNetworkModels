@@ -25,7 +25,7 @@
 % that belongs to one region
 % This script tries t
 
-function [number_of_components, largest_component, this_size, varargout] = DetectDisconnectedPatches(TR, v_idx, visual_debug)
+function [number_of_components, largest_component, lc_size, bad_vertices, varargout] = DetectDisconnectedPatches(TR, v_idx, visual_debug)
 if nargin < 3
     visual_debug = 0;
 end
@@ -54,9 +54,11 @@ end
     [n, e] = histcounts(bins(1:length(v_idx)));
     
     these_bins = e(2:end)-e(1); 
-    [this_size, this_bin] = max(n);
+    [lc_size, this_bin] = max(n);
     
     largest_component = these_bins(this_bin);
+    % Vertices in disconnected patches - corresponds to i-th vertex in TR
+    bad_vertices = v_idx((bins(1:length(v_idx)) ~=largest_component));
     
 % Visual debugging 
 if visual_debug
