@@ -69,4 +69,4 @@ if visual_debug
    varargout{2} = GraphPlotHandle;
 end
 
-end
+end %function DetectDisconnectedPatches()
