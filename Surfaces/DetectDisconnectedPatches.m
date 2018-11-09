@@ -6,7 +6,12 @@
 %                    anatomical region.
 %
 % OUTPUT: 
-%          Maximum number of patches that make up that region -- an integer 
+%          number_of_components -- the number of components/patches detected
+%          largest_component    -- the index of the largest component
+%          lc_size              -- the size (in number of vertices) of the
+%                                 largest component
+%          bad_vertices         -- indices of the vertices that are in other (smaller) components 
+%          varargout            -- variable output, mainly figure handles
 %
 % REQUIRES: 
 %          TriRep -- A Matlab object, not yet available in Octave.
