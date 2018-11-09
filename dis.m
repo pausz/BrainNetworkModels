@@ -42,7 +42,7 @@
 
 function y=dis(a,b)
   
-  if size(a)==size(b),
+  if size(a)==size(b)
     y = sqrt(sum((a-b).^2));
   else
     [dim,szt]=size(a);
