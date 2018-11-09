@@ -21,9 +21,6 @@
 %}
 % Paula Sanz-Leon (2018-11-07)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% How to detect if there is more than one component in the local surface
-% that belongs to one region
-% This script tries t
 
 function [number_of_components, largest_component, lc_size, bad_vertices, varargout] = DetectDisconnectedPatches(TR, v_idx, visual_debug)
 if nargin < 3
