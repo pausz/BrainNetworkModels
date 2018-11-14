@@ -17,7 +17,7 @@
 %
 % USAGE:
 %{     
-       TR = triangulation(Triangles, Vertices);
+       tr = triangulation(Triangles, Vertices);
        SurfaceConnectivity(TR, options)
 %}
 %

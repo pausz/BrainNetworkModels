@@ -64,9 +64,11 @@ function [ThisFigure, TheMovie] = SurfaceOnlyMovie(Surface, TimeSeries, Mapping,
  %Map timeseries to colormap indices
   %cmap = [linspace(0.5,1,256)', 0.5*ones(256,2)];
   %MAP = colormap(cmap);
-  MAP = colormap(colorcube);
-  ColourSteps = size(MAP,1);
-  TimeSeries = max(fix(((TimeSeries-MinData) ./ (MaxData-MinData)) .* ColourSteps), 1); 
+  %MAP = colormap(colorcube);
+  load('BlueGreyRed')
+  MAP=colormap(BlueGreyRed);
+  %ColourSteps = size(MAP,1);
+  %TimeSeries = max(fix(((TimeSeries-MinData) ./ (MaxData-MinData)) .* ColourSteps), 1); 
 
    subplot(SurfacePaneHandle),
    SurfaceHandle = patch('Faces', Surface.Triangulation(1:1:end,:) , 'Vertices', Surface.X, ...
@@ -79,8 +81,9 @@ function [ThisFigure, TheMovie] = SurfaceOnlyMovie(Surface, TimeSeries, Mapping,
    box on
    axis equal %daspect([1 1 1])
    colorbar('location','southoutside');
-   caxis(SurfacePaneHandle, 'manual');
-   caxis(SurfacePaneHandle, [1 ColourSteps]);
+   %caxis(SurfacePaneHandle, 'manual');
+   max_val = max(abs(TimeSeries(:)));
+   caxis(SurfacePaneHandle, [-max_val/2 max_val/2]);
 %keyboard                       
 
 %% Movie: update surface colour and progress line in time series plot. 
